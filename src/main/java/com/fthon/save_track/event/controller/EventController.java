@@ -22,7 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/events")
-@Tag(name = "이벤트 관리", description = "이벤트 관리를 위한 API")
+@Tag(name = "이벤트 관련 API", description = "카테고리 관련 API")
 public class EventController {
 
     @Operation(summary = "이벤트 목록 조회", description = "페이지네이션과 선택적 카테고리 필터를 기반으로 이벤트 목록을 조회합니다")
