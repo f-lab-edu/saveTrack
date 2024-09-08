@@ -16,6 +16,7 @@ public class BaseEntity {
     @Id @GeneratedValue
     private Long id;
 
+    @Column(updatable = false)
     private ZonedDateTime createdAt;
 
     private ZonedDateTime updatedAt;
