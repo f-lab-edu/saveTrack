@@ -1,4 +1,4 @@
-package com.fthon.save_track.common;
+package com.fthon.save_track.common.config;
 
 
 import io.swagger.v3.oas.models.Components;
