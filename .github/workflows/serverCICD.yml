@@ -1,0 +1,40 @@
+name: Server CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Grant execute permission for gradlew
+      working-directory: ./{need modify}
+      run: chmod +x ./gradlew
+      shell: bash
+
+    - name: Gradle Caching
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+      ## gradle build
+    - name: Build with Gradle
+      working-directory: ./{need modify}
+      run: ./gradlew build -x test
+
+    - name: serving script in ec2 
