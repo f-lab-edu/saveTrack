@@ -43,9 +43,9 @@ jobs:
     - name: serving script in ec2 
       uses: appleboy/ssh-action@master   
       with:
-        key: ${{ secrets.SERVER_EC2_SSH_KEY }}
         host: ${{ secrets.SERVER_EC2_HOST }}
         username: ${{ secrets.SERVER_EC2_USER }}
+        password: ${{ secrets.EC2_PASSWORD }}
         scirpt: |
           ./script.sh
         
