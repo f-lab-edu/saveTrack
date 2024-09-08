@@ -18,7 +18,7 @@ jobs:
         distribution: 'temurin'
 
     - name: Grant execute permission for gradlew
-      working-directory: ./{need modify}
+      working-directory: ./saveTrack
       run: chmod +x ./gradlew
       shell: bash
 
@@ -34,7 +34,15 @@ jobs:
 
       ## gradle build
     - name: Build with Gradle
-      working-directory: ./{need modify}
+      working-directory: ./saveTrack
       run: ./gradlew build -x test
 
     - name: serving script in ec2 
+      uses: appleboy/ssh-action@master   
+      with:
+        key: ${{ secrets.SERVER_EC2_SSH_KEY }}
+        host: ${{ secrets.SERVER_EC2_HOST }}
+        username: ${{ secrets.SERVER_EC2_USER }}
+        scirpt: |
+          ./script.sh
+        
