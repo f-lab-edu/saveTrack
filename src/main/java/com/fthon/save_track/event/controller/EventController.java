@@ -100,6 +100,20 @@ public class EventController {
         return ResponseEntity.ok().build();
     }
 
+
+    @Operation(summary = "이벤트 완료 체크", description = "특정 이벤트를 완료 상태로 표시합니다")
+    @ApiResponse(responseCode = "201", description = "이벤트가 성공적으로 완료 처리됨")
+    @ApiResponse(responseCode = "400", description = "잘못된 요청",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "이벤트를 찾을 수 없음",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @PostMapping("/{eventId}/check")
+    public ResponseEntity<Void> checkEvent(
+            @Parameter(description = "완료할 이벤트의 ID") @PathVariable String eventId
+    ){
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
     public static class EventListResponse extends CommonResponse<List<EventSearchResponse>> {
         public EventListResponse(List<EventSearchResponse> data) {
             super(data);
