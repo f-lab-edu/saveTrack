@@ -21,7 +21,7 @@ jobs:
         distribution: 'temurin'
 
     - name: Grant execute permission for gradlew
-      working-directory: ./saveTrack
+      working-directory: ./
       run: chmod +x ./gradlew
       shell: bash
 
@@ -37,7 +37,7 @@ jobs:
 
       ## gradle build
     - name: Build with Gradle
-      working-directory: ./saveTrack
+      working-directory: ./
       run: ./gradlew build -x test
 
     - name: serving script in ec2 
