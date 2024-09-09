@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "인증 관련 API", description = "OAuth2 로그인 관련 API")
 public class AuthController {
 
-    private final JwtUtils jwtUtils;
 
     @Operation(summary = "OAuth2 로그인", description = "OAuth2 로그인을 처리합니다.")
     @ApiResponse(responseCode = "200", description = "성공적으로 로그인된 경우로, Access Token은 Authorization 헤더에 담겨서 전달됩니다.")
@@ -30,10 +29,10 @@ public class AuthController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/oauth")
     public void oAuthLogin(
-            @RequestBody OAuth2LoginRequest reqBody,
-            HttpServletResponse resp
+            @RequestBody OAuth2LoginRequest reqBody
+
     ){
-        // 로그인 로직
+        System.out.println();
     }
 
 }
