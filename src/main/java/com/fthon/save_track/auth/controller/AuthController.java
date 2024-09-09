@@ -2,7 +2,7 @@ package com.fthon.save_track.auth.controller;
 
 
 import com.fthon.save_track.auth.dto.OAuth2LoginRequest;
-import com.fthon.save_track.auth.utils.JwtUtils;
+import com.fthon.save_track.auth.service.AuthService;
 import com.fthon.save_track.common.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "인증 관련 API", description = "OAuth2 로그인 관련 API")
 public class AuthController {
 
-    private final JwtUtils jwtUtils;
+    private final AuthService authService;
 
     @Operation(summary = "OAuth2 로그인", description = "OAuth2 로그인을 처리합니다.")
     @ApiResponse(responseCode = "200", description = "성공적으로 로그인된 경우로, Access Token은 Authorization 헤더에 담겨서 전달됩니다.")
@@ -32,8 +33,11 @@ public class AuthController {
     public void oAuthLogin(
             @RequestBody OAuth2LoginRequest reqBody,
             HttpServletResponse resp
+
     ){
-        // 로그인 로직
+        String jwt = authService.doOAuth2Login(reqBody);
+
+        resp.setHeader(HttpHeaders.AUTHORIZATION, jwt);
     }
 
 }
