@@ -4,7 +4,7 @@ services:
     container_name: saveTrack-mysql
     image: mysql/mysql-server:8.0.27
     environment:
-      - MYSQL_DATABASE=error
+      - MYSQL_DATABASE=saveTrack
       - MYSQL_ROOT_HOST=%
       - MYSQL_ROOT_PASSWORD=root
     command: [ "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci", "--lower_case_table_names=1", "--max_connections=2048", "--wait_timeout=3600" ]
@@ -39,7 +39,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://saveTrack-mysql:3306/saveTrack?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-      SPRING_PROFILES_ACTIVE: dev
+      SPRING_PROFILES_ACTIVE: prod
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
       SPRING_REDIS_PASSWORD: root
