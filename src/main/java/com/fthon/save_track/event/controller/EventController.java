@@ -1,9 +1,12 @@
 package com.fthon.save_track.event.controller;
 
 
+import com.fthon.save_track.auth.dto.AuthenticatedUserDto;
+import com.fthon.save_track.auth.resolvers.annotation.LoginedUser;
 import com.fthon.save_track.common.dto.CommonResponse;
 import com.fthon.save_track.common.dto.ErrorResponse;
 import com.fthon.save_track.event.dto.request.EventCreateRequest;
+import com.fthon.save_track.event.dto.request.EventUpdateRequest;
 import com.fthon.save_track.event.dto.response.EventDetailSearchResponse;
 import com.fthon.save_track.event.dto.response.EventSearchResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,7 +61,8 @@ public class EventController {
     @PostMapping("/{eventId}")
     public ResponseEntity<Void> addEvent(
             @Parameter(description = "생성할 이벤트의 ID") @PathVariable String eventId,
-            @RequestBody EventCreateRequest reqBody
+            @RequestBody EventCreateRequest reqBody,
+            @LoginedUser AuthenticatedUserDto userInfo
     ){
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -71,7 +75,9 @@ public class EventController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{eventId}")
     public ResponseEntity<Void> updateEvent(
-            @Parameter(description = "수정할 이벤트의 ID") @PathVariable String eventId
+            @Parameter(description = "수정할 이벤트의 ID") @PathVariable String eventId,
+            @RequestBody EventUpdateRequest updateInfo,
+            @LoginedUser AuthenticatedUserDto userInfo
     ){
         return ResponseEntity.ok().build();
     }
@@ -84,7 +90,8 @@ public class EventController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/{eventId}/subscribe")
     public ResponseEntity<Void> subscribe(
-            @Parameter(description = "구독할 이벤트의 ID") @PathVariable String eventId
+            @Parameter(description = "구독할 이벤트의 ID") @PathVariable String eventId,
+            @LoginedUser AuthenticatedUserDto userInfo
     ){
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -95,7 +102,8 @@ public class EventController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @DeleteMapping("/{eventId}/subscribe")
     public ResponseEntity<Void> cancelSubscribe(
-            @Parameter(description = "구독 취소할 이벤트의 ID") @PathVariable String eventId
+            @Parameter(description = "구독 취소할 이벤트의 ID") @PathVariable String eventId,
+            @LoginedUser AuthenticatedUserDto userInfo
     ){
         return ResponseEntity.ok().build();
     }
@@ -109,7 +117,8 @@ public class EventController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/{eventId}/check")
     public ResponseEntity<Void> checkEvent(
-            @Parameter(description = "완료할 이벤트의 ID") @PathVariable String eventId
+            @Parameter(description = "완료할 이벤트의 ID") @PathVariable String eventId,
+            @LoginedUser AuthenticatedUserDto userInfo
     ){
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

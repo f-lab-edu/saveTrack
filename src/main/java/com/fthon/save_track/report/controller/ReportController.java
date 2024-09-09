@@ -1,6 +1,8 @@
 package com.fthon.save_track.report.controller;
 
 
+import com.fthon.save_track.auth.dto.AuthenticatedUserDto;
+import com.fthon.save_track.auth.resolvers.annotation.LoginedUser;
 import com.fthon.save_track.common.dto.CommonResponse;
 import com.fthon.save_track.common.dto.ErrorResponse;
 import com.fthon.save_track.report.dto.ReportDateResponse;
@@ -35,7 +37,8 @@ public class ReportController {
             @Parameter(description = "조회 시작 날짜 (yyyy-MM-dd 형식)")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @Parameter(description = "조회 종료 날짜 (yyyy-MM-dd 형식)")
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @LoginedUser AuthenticatedUserDto userInfo
     ) {
         return ResponseEntity.ok(null);
     }

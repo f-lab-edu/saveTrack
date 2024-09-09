@@ -1,6 +1,8 @@
 package com.fthon.save_track.badge.controller;
 
 
+import com.fthon.save_track.auth.dto.AuthenticatedUserDto;
+import com.fthon.save_track.auth.resolvers.annotation.LoginedUser;
 import com.fthon.save_track.badge.dto.BadgeSearchResponse;
 import com.fthon.save_track.common.dto.CommonResponse;
 import com.fthon.save_track.common.dto.ErrorResponse;
@@ -27,7 +29,9 @@ public class BadgeController {
     @ApiResponse(responseCode = "400", description = "잘못된 요청",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("")
-    public ResponseEntity<BadgeListResponse> getList() {
+    public ResponseEntity<BadgeListResponse> getList(
+            @LoginedUser AuthenticatedUserDto userInfo
+    ) {
         return ResponseEntity.ok(null);
     }
 
