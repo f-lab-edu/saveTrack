@@ -6,6 +6,7 @@ import com.fthon.save_track.common.dto.ErrorResponse;
 import com.fthon.save_track.event.application.dto.request.CreateCategoryRequest;
 import com.fthon.save_track.event.application.dto.response.CategorySearchResponse;
 import com.fthon.save_track.event.application.service.CategoryService;
+import com.fthon.save_track.event.persistence.Category;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,16 +32,22 @@ public class CategoryController {
     @ApiResponse(responseCode = "400", description = "잘못된 요청",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping()
-    public ResponseEntity<CategoryListResponse> getList() {
-        return ResponseEntity.ok(null);
+    public ResponseEntity<List<Category>> getList() {
+        List<Category> data = categoryService.getCategory();
+        return ResponseEntity.ok(data);
     }
 
+    @Operation(summary = "세로운 카테고리 생성", description = "새로운 카테고리를 생성합니다")
+    @ApiResponse(responseCode = "200", description = "성공적으로 조회됨",
+            content = @Content(schema = @Schema(implementation = CategoryListResponse.class)))
+    @ApiResponse(responseCode = "400", description = "잘못된 요청",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
-    public void createCategory(
-            @RequestBody CreateCategoryRequest request
-    ) {
-
+    public void createCategory() {
+        categoryService.createCategory();
     }
+
+
 
     public static class CategoryListResponse extends CommonResponse<List<CategorySearchResponse>> {
         public CategoryListResponse(List<CategorySearchResponse> data) {
