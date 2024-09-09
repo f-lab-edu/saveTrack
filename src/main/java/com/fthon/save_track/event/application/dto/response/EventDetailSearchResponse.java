@@ -1,4 +1,4 @@
-package com.fthon.save_track.event.dto.response;
+package com.fthon.save_track.event.application.dto.response;
 
 import com.fthon.save_track.common.consts.TimeOfDay;
 import lombok.AllArgsConstructor;
