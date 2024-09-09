@@ -23,7 +23,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/**").permitAll() // 실 운영시 지워야 함.
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
