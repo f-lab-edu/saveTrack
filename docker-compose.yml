@@ -13,17 +13,17 @@ services:
     volumes: #볼륨 지정
       - ./resources/develop-environment/mysql-init.d:/docker-entrypoint-initdb.d
     networks: #사용할 네트워크 지정
-      - saveTrack-network
+      - saveTrack
 
   redis:
-    container_name: redis
+    container_name: saveTrack-redis
     image: redis:latest
     expose:
       - 6379:6379
     environment:
       - REDIS_PASSWORD=root
     networks:
-      - saveTrack-network
+      - saveTrack
 
   backend:
     build:
@@ -45,4 +45,6 @@ services:
       SPRING_REDIS_PASSWORD: root
 
     networks: #사용할 네트워크 지정
-      - saveTrack-network
+      - saveTrack
+networks:
+  saveTrack:
