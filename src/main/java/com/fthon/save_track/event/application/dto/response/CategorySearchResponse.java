@@ -1,4 +1,4 @@
-package com.fthon.save_track.event.dto.response;
+package com.fthon.save_track.event.application.dto.response;
 
 
 import lombok.AllArgsConstructor;
