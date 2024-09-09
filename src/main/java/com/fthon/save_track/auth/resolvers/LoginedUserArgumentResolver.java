@@ -12,7 +12,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 @Component
-public class LoginedUserArgumentResolvers implements HandlerMethodArgumentResolver {
+public class LoginedUserArgumentResolver implements HandlerMethodArgumentResolver {
 
 
     @Override
