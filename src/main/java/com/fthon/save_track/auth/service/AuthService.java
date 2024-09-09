@@ -25,6 +25,12 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
 
+
+    /**
+     * 카카오 토큰을 입력받아 DB에 사용자 정보를 필요시 저장하고 JWT를 반환한다.
+     * @author minseok kim
+     * @return JWT Token
+    */
     public String doOAuth2Login(OAuth2LoginRequest loginRequest){
 
         KakaoUserInfo result = kakaoOAuth2Client.getUserInfo(loginRequest.getAccessToken());
