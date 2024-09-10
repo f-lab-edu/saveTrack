@@ -15,7 +15,6 @@ import java.util.Objects;
 public class BaseEntity {
 
     @Id @Tsid
-    @GeneratedValue
     private Long id;
 
     @Column(updatable = false)
