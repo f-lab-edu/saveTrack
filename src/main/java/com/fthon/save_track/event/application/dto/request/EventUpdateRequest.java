@@ -1,4 +1,4 @@
-package com.fthon.save_track.event.dto.response;
+package com.fthon.save_track.event.application.dto.request;
 
 
 import lombok.AllArgsConstructor;
@@ -11,12 +11,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class EventSearchResponse {
+public class EventUpdateRequest {
 
-    private String eventId;
     private String name;
     private String purpose;
     private List<DayOfWeek> dayOfWeeks;
-    private Integer joinCount;
-
+    private String categoryId;
+    private String morningCheerMessage;
+    private String afternoonCheerMessage;
+    private String eveningCheerMessage;
 }

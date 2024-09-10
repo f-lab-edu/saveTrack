@@ -1,6 +1,7 @@
 package com.fthon.save_track.common.domain;
 
 
+import io.hypersistence.utils.hibernate.id.Tsid;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,7 @@ import java.util.Objects;
 @Getter
 public class BaseEntity {
 
-    @Id @GeneratedValue
+    @Id @Tsid
     private Long id;
 
     @Column(updatable = false)

@@ -1,4 +1,4 @@
-package com.fthon.save_track.event.dto.request;
+package com.fthon.save_track.event.application.dto.request;
 
 
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class EventUpdateRequest {
+public class EventCreateRequest {
 
     private String name;
     private String purpose;
@@ -20,4 +20,5 @@ public class EventUpdateRequest {
     private String morningCheerMessage;
     private String afternoonCheerMessage;
     private String eveningCheerMessage;
+
 }
