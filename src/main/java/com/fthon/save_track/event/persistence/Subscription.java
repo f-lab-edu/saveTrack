@@ -14,10 +14,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "subscription")
 public class Subscription extends BaseEntity {
 
-    @Id
-    @GeneratedValue
-    private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
     private Event eventEntity;
