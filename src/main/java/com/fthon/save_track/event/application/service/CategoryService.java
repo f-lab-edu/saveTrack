@@ -23,11 +23,16 @@ public class CategoryService {
 
         List<String> categories = Arrays.asList("환경", "돈", "시간");
         for (String categoryName : categories){
-            Category category = Category.builder()
-                    .name(categoryName)
-                    .build();
-            categoryRepository.save(category);
+            if (!isCategoryExist(categoryName)) {
+                Category category = Category.builder()
+                        .name(categoryName)
+                        .build();
+                categoryRepository.save(category);
+            }
         }
+    }
+    private boolean isCategoryExist(String categoryName) {
+        return categoryRepository.findByName(categoryName).isPresent();
     }
 
     public List<Category> getCategory() {
