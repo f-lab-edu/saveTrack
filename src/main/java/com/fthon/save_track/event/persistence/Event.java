@@ -18,9 +18,9 @@ import java.util.List;
 public class Event extends BaseEntity {
 
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
-    private List<Category> category;
+    private Category category;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "subscription_id")

@@ -1,5 +1,6 @@
 package com.fthon.save_track.badge.persistence;
 
+import com.fthon.save_track.event.persistence.Category;
 import com.fthon.save_track.event.persistence.Event;
 import com.fthon.save_track.user.persistence.User;
 import jakarta.persistence.EntityManager;
@@ -12,6 +13,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
@@ -38,7 +40,7 @@ class BadgeTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTotalCategoryTestData")
+    @MethodSource("getCategoryTestData")
     @DisplayName("사용자의 전체 EventLog의 갯수를 측정하여 뱃지를 얻을 수 있는지 체크할 수 있다.")
     public void testCheckTotalCategory(int logCount, boolean expected) throws Exception{
         //given
@@ -78,9 +80,59 @@ class BadgeTest {
 
     }
 
+    @ParameterizedTest
+    @MethodSource("getCategoryTestData")
+    @DisplayName("사용자의 특정 카테고리에 속한 이벤트의 갯수를 집계하여 뱃지를 얻을 수 있는지 체크할 수 있다.")
+    public void testCheckIndividualCategory(int logCount, boolean expected) throws Exception{
+        //given
+        Category category = new Category("카테고리");
+
+        BadgeChallengeStrategy strategy = new IndividualCategoryCountStrategy(1, category);
+
+        Badge badge = new Badge("뱃지 1", strategy);
+        User user = new User("nickname", 1234L, "email@email.com");
+        Event event = new Event(category, List.of(), "이벤트", "내용", "메시지1","메시지2","메시지3");
+        Event event2 = new Event();
+
+        for(int i = 0; i < logCount; i++){
+            user.addLog(event, true);
+        }
+        user.addLog(event2, true);
+        //when
+
+        boolean actual = badge.getStrategy().check(user);
+
+        //then
+        assertThat(actual).isEqualTo(expected);
+
+    }
 
 
-    private static Stream<Arguments> getTotalCategoryTestData(){
+    @Test
+    @DisplayName("사용자의 특정 카테고리의 EventLog의 갯수를 집계하여 뱃지를 얻을수 있는지 체크할 때, false로 체크한 것은 갯수에 포함하지 않는다.")
+    public void testCheckIndividualCategorySumBool(){
+        // given
+        Category category = new Category("카테고리");
+
+        BadgeChallengeStrategy strategy = new IndividualCategoryCountStrategy(1, category);
+
+        Badge badge = new Badge("뱃지 1", strategy);
+        User user = new User("nickname", 1234L, "email@email.com");
+        Event event = new Event(category, List.of(), "이벤트", "내용", "메시지1","메시지2","메시지3");
+
+        user.addLog(event, false);
+
+        //when
+        boolean actual = badge.getStrategy().check(user);
+
+
+        //then
+        assertThat(actual).isFalse();
+
+    }
+
+
+    private static Stream<Arguments> getCategoryTestData(){
         return Stream.of(
                 Arguments.of(0, false),
                 Arguments.of(1, true),
