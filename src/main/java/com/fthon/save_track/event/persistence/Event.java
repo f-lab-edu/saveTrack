@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @AllArgsConstructor
@@ -17,13 +19,15 @@ public class Event extends BaseEntity {
     @GeneratedValue
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
-    private Category category;
+    private List<Category> category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "subscription_id")
-    private Subscription subscribeEntity;
+    private List<Subscription> subscribeEntity;
+
+
 
     private String eventName;
     private String eventContent;
