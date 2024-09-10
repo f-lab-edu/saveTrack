@@ -15,9 +15,6 @@ import java.util.List;
 @Table(name = "event")
 public class Event extends BaseEntity {
 
-    @Id
-    @GeneratedValue
-    private Long id;
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")

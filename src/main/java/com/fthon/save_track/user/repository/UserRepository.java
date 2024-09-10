@@ -1,6 +1,6 @@
 package com.fthon.save_track.user.repository;
 
-import com.fthon.save_track.user.entity.User;
+import com.fthon.save_track.user.persistence.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

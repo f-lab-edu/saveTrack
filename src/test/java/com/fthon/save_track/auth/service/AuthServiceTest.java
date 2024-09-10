@@ -3,7 +3,7 @@ package com.fthon.save_track.auth.service;
 import com.fthon.save_track.auth.dto.KakaoUserInfo;
 import com.fthon.save_track.auth.dto.OAuth2LoginRequest;
 import com.fthon.save_track.auth.service.client.KakaoOAuth2Client;
-import com.fthon.save_track.user.entity.User;
+import com.fthon.save_track.user.persistence.User;
 import com.fthon.save_track.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

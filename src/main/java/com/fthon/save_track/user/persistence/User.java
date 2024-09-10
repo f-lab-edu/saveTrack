@@ -1,4 +1,4 @@
-package com.fthon.save_track.user.entity;
+package com.fthon.save_track.user.persistence;
 
 
 import com.fthon.save_track.common.domain.BaseEntity;
