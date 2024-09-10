@@ -1,6 +1,7 @@
 package com.fthon.save_track.user.persistence;
 
 
+import com.fthon.save_track.badge.persistence.Badge;
 import com.fthon.save_track.common.domain.BaseEntity;
 import com.fthon.save_track.event.persistence.Event;
 import jakarta.persistence.*;
@@ -36,8 +37,16 @@ public class User extends BaseEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<UserEventLog> logs = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<UserBadge> badges = new ArrayList<>();
+
+
     public void addLog(Event event, boolean isCheck){
         this.logs.add(new UserEventLog(this, event, isCheck));
+    }
+
+    public void addBadge(Badge badge){
+        this.badges.add(new UserBadge(this, badge));
     }
 
 }
