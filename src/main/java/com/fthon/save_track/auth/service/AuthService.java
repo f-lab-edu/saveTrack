@@ -41,7 +41,7 @@ public class AuthService {
 
         return jwtUtils.sign(
                 new AuthenticatedUserDto(
-                        user.getUid(),
+                        user.getId().toString(),
                         user.getEmail(),
                         user.getNickname()
                 ),
@@ -54,7 +54,6 @@ public class AuthService {
     private User saveProcess(KakaoUserInfo kakaoUserInfo){
         User user = new User(
                 kakaoUserInfo.getKakaoAccount().getName(),
-                UUID.randomUUID().toString(),
                 kakaoUserInfo.getId(),
                 kakaoUserInfo.getKakaoAccount().getEmail()
         );
