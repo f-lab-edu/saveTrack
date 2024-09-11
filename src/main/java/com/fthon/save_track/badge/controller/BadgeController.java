@@ -37,7 +37,7 @@ public class BadgeController {
     public ResponseEntity<BadgeListResponse> getList(
             @LoginedUser AuthenticatedUserDto userInfo
     ) {
-        BadgeListResponse respBody = new BadgeListResponse(badgeService.getBadges(userInfo.getId()));
+        BadgeListResponse respBody = new BadgeListResponse(200, badgeService.getBadges(userInfo.getId()));
         return ResponseEntity.ok(respBody);
     }
 
@@ -45,8 +45,12 @@ public class BadgeController {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @Getter
     public static class BadgeListResponse extends CommonResponse<List<BadgeSearchResponse>> {
-        public BadgeListResponse(List<BadgeSearchResponse> data) {
-            super(data);
+        public BadgeListResponse(int code, String message, List<BadgeSearchResponse> data) {
+            super(code, message, data);
+        }
+
+        public BadgeListResponse(int code, List<BadgeSearchResponse> data) {
+            super(code, data);
         }
     }
 }

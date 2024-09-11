@@ -32,26 +32,20 @@ public class CategoryController {
     @ApiResponse(responseCode = "400", description = "잘못된 요청",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping()
-    public ResponseEntity<List<Category>> getList() {
-        List<Category> data = categoryService.getCategory();
-        return ResponseEntity.ok(data);
-    }
-
-    @Operation(summary = "세로운 카테고리 생성", description = "새로운 카테고리를 생성합니다")
-    @ApiResponse(responseCode = "200", description = "성공적으로 조회됨",
-            content = @Content(schema = @Schema(implementation = CategoryListResponse.class)))
-    @ApiResponse(responseCode = "400", description = "잘못된 요청",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    @PostMapping
-    public void createCategory() {
-        categoryService.createCategory();
+    public ResponseEntity<CategoryListResponse> getList() {
+        List<CategorySearchResponse> data = categoryService.getCategory().stream().map(CategorySearchResponse::of).toList();
+        return ResponseEntity.ok(new CategoryListResponse(200, data));
     }
 
 
 
     public static class CategoryListResponse extends CommonResponse<List<CategorySearchResponse>> {
-        public CategoryListResponse(List<CategorySearchResponse> data) {
-            super(data);
+        public CategoryListResponse(int code, String message, List<CategorySearchResponse> data) {
+            super(code, message, data);
+        }
+
+        public CategoryListResponse(int code, List<CategorySearchResponse> data) {
+            super(code, data);
         }
     }
 }

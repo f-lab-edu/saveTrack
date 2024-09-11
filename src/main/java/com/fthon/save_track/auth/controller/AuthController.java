@@ -2,7 +2,7 @@ package com.fthon.save_track.auth.controller;
 
 
 import com.fthon.save_track.auth.dto.OAuth2LoginRequest;
-import com.fthon.save_track.auth.dto.OAuth2LoginResponse;
+import com.fthon.save_track.auth.dto.LoginResponse;
 import com.fthon.save_track.auth.service.AuthService;
 import com.fthon.save_track.common.dto.CommonResponse;
 import com.fthon.save_track.common.dto.ErrorResponse;
@@ -27,21 +27,34 @@ public class AuthController {
     @ApiResponse(responseCode = "400", description = "잘못된 요청",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/oauth")
-    public CommonResponse<OAuth2LoginResponse> oAuthLogin(
+    public LoginResp oAuthLogin(
             @RequestBody OAuth2LoginRequest reqBody
 
     ){
         String jwt = authService.doOAuth2Login(reqBody);
 
-        return new CommonResponse<>(new OAuth2LoginResponse(jwt));
+        return new LoginResp(200, new LoginResponse(jwt));
     }
 
     @Operation(summary = "개발용 로그인", description = "개발할 때 사용할 임시 API입니다.")
     @PostMapping("/temp")
-    public CommonResponse<String> tempLogin(
+    public LoginResp tempLogin(
             @RequestParam String email
     ){
-        return new CommonResponse<>(authService.loginByEmail(email));
+        String jwt = authService.loginByEmail(email);
+        return new LoginResp(200, new LoginResponse(jwt));
+    }
+
+
+    public static class LoginResp extends CommonResponse<LoginResponse>{
+
+        public LoginResp(int code, String message, LoginResponse data) {
+            super(code, message, data);
+        }
+
+        public LoginResp(int code, LoginResponse data) {
+            super(code, data);
+        }
     }
 
 }
