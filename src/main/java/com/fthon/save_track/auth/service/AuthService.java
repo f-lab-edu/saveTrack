@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -49,6 +48,17 @@ public class AuthService {
         );
     }
 
+
+    @Transactional(readOnly = true)
+    public String loginByEmail(String email){
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if(user.isEmpty()){
+            throw new RuntimeException("유저를 조회할 수 없습니다.");
+        }
+
+        return jwtUtils.sign(AuthenticatedUserDto.of(user.get()), new Date());
+    }
 
 
     private User saveProcess(KakaoUserInfo kakaoUserInfo){

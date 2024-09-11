@@ -1,6 +1,7 @@
 package com.fthon.save_track.auth.dto;
 
 
+import com.fthon.save_track.user.persistence.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,4 +12,13 @@ public class AuthenticatedUserDto {
     private final String uid;
     private final String email;
     private final String nickname;
+
+
+    public static AuthenticatedUserDto of(User user){
+        return new AuthenticatedUserDto(
+                Long.toString(user.getId()),
+                user.getEmail(),
+                user.getNickname()
+        );
+    }
 }
