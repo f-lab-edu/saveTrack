@@ -11,7 +11,8 @@ import java.time.ZonedDateTime;
 @Getter
 public class BadgeSearchResponse {
 
-    private String badgeId;
+    private Long badgeId;
     private String badgeName;
+    private boolean acquired;
     private ZonedDateTime acquiredAt;
 }

@@ -8,7 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class AuthenticatedUserDto {
 
-    private final String uid;
+    private final Long id;
     private final String email;
     private final String nickname;
 }
