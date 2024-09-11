@@ -3,7 +3,7 @@ package com.fthon.save_track.auth.controller;
 
 import com.fthon.save_track.auth.dto.OAuth2LoginRequest;
 import com.fthon.save_track.auth.dto.LoginResponse;
-import com.fthon.save_track.auth.service.AuthService;
+import com.fthon.save_track.user.service.UserService;
 import com.fthon.save_track.common.dto.CommonResponse;
 import com.fthon.save_track.common.dto.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "인증 관련 API", description = "OAuth2 로그인 관련 API")
 public class AuthController {
 
-    private final AuthService authService;
+    private final UserService userService;
 
     @Operation(summary = "OAuth2 로그인", description = "OAuth2 로그인을 처리합니다.")
     @ApiResponse(responseCode = "200", description = "성공적으로 로그인된 경우로, Access Token은 Response Body에 담겨서 전달됩니다.")
@@ -31,7 +31,7 @@ public class AuthController {
             @RequestBody OAuth2LoginRequest reqBody
 
     ){
-        String jwt = authService.doOAuth2Login(reqBody);
+        String jwt = userService.doOAuth2Login(reqBody);
 
         return new LoginResp(200, new LoginResponse(jwt));
     }
@@ -41,7 +41,7 @@ public class AuthController {
     public LoginResp tempLogin(
             @RequestParam String email
     ){
-        String jwt = authService.loginByEmail(email);
+        String jwt = userService.loginByEmail(email);
         return new LoginResp(200, new LoginResponse(jwt));
     }
 
