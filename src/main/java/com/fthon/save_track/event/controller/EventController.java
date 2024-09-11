@@ -39,8 +39,8 @@ public class EventController {
     private final EventService eventService;
 
     @Operation(summary = "이벤트 목록 조회", description = "페이지네이션과 선택적 카테고리 필터를 기반으로 이벤트 목록을 조회합니다")
-    @ApiResponse(responseCode = "200", description = "성공적으로 조회됨",
-            content = @Content(schema = @Schema(implementation = EventListResponse.class)))
+    @ApiResponse(responseCode = "200", description = "성공적으로 조회됨")
+            //content = @Content(schema = @Schema(implementation = EventListResponse.class)))
     @ApiResponse(responseCode = "400", description = "잘못된 요청",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("")
@@ -54,8 +54,8 @@ public class EventController {
     }
 
     @Operation(summary = "이벤트 상세 정보 조회", description = "특정 이벤트의 상세 정보를 조회합니다")
-    @ApiResponse(responseCode = "200", description = "성공적으로 조회됨",
-            content = @Content(schema = @Schema(implementation = EventDetailResponse.class)))
+    @ApiResponse(responseCode = "200", description = "성공적으로 조회됨")
+            //content = @Content(schema = @Schema(implementation = EventDetailResponse.class)))
     @ApiResponse(responseCode = "404", description = "이벤트를 찾을 수 없음",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/{eventId}")
@@ -152,22 +152,5 @@ public class EventController {
             @LoginedUser AuthenticatedUserDto userInfo
     ){
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse(201, null));
-    }
-
-    public static class EventListResponse extends CommonResponse<List<EventSearchResponse>> {
-        public EventListResponse(int code, String message, List<EventSearchResponse> data) {
-            super(code, message, data);
-        }
-
-        public EventListResponse(int code, List<EventSearchResponse> data) {
-            super(code, data);
-        }
-    }
-
-    public static class EventDetailResponse extends CommonResponse<getDatailEventResponse> {
-        public EventDetailResponse(getDatailEventResponse data) {
-            super(data);
-
-        }
     }
 }
