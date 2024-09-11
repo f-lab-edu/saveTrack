@@ -1,6 +1,7 @@
 package com.fthon.save_track.event.application.dto.response;
 
 
+import com.fthon.save_track.event.persistence.Category;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,14 @@ import lombok.NoArgsConstructor;
 @Getter
 public class CategorySearchResponse {
 
-    private String categoryId;
+    private Long categoryId;
     private String categoryName;
 
+
+    public static CategorySearchResponse of(Category category){
+        return new CategorySearchResponse(
+                category.getId(),
+                category.getName()
+        );
+    }
 }

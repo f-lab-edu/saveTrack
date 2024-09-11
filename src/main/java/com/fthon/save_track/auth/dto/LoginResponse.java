@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class OAuth2LoginResponse {
+public class LoginResponse {
 
     private String token;
 

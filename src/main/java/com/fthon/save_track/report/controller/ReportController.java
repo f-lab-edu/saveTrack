@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reports")
@@ -28,7 +29,7 @@ import java.util.List;
 public class ReportController {
 
     @Operation(summary = "기간별 리포트 조회", description = "지정된 기간의 리포트를 조회합니다")
-    @ApiResponse(responseCode = "200", description = "성공적으로 조회됨",
+    @ApiResponse(responseCode = "200", description = "성공적으로 조회됨, swagger 응답양식의 additionalProps에는 yyyy-MM-dd 형식의 날짜가 들어갑니다.",
             content = @Content(schema = @Schema(implementation = ReportListResponse.class)))
     @ApiResponse(responseCode = "400", description = "잘못된 요청",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -43,9 +44,13 @@ public class ReportController {
         return ResponseEntity.ok(null);
     }
 
-    public static class ReportListResponse extends CommonResponse<List<ReportDateResponse>> {
-        public ReportListResponse(List<ReportDateResponse> data) {
-            super(data);
+    public static class ReportListResponse extends CommonResponse<Map<LocalDate, ReportDateResponse>> {
+        public ReportListResponse(int code, String message, Map<LocalDate, ReportDateResponse> data) {
+            super(code, message, data);
+        }
+
+        public ReportListResponse(int code, Map<LocalDate, ReportDateResponse> data) {
+            super(code, data);
         }
     }
 }

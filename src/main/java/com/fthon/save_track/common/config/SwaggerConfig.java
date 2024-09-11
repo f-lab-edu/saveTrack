@@ -32,7 +32,7 @@ public class SwaggerConfig {
         return new Info()
                 .title("SaveTrack API Spec.")
                 .description("SaveTrack API 명세서 입니다.")
-                .version("1.0.0");
+                .version("1.0.1");
     }
 
 }

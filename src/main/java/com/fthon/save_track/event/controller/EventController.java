@@ -20,7 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+import java.util.Objects;
 
 
 @RestController
@@ -59,12 +59,12 @@ public class EventController {
     @ApiResponse(responseCode = "400", description = "잘못된 입력",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/{eventId}")
-    public ResponseEntity<Void> addEvent(
+    public ResponseEntity<CommonResponse> addEvent(
             @Parameter(description = "생성할 이벤트의 ID") @PathVariable String eventId,
             @RequestBody EventCreateRequest reqBody,
             @LoginedUser AuthenticatedUserDto userInfo
     ){
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse(201, null));
     }
 
     @Operation(summary = "이벤트 수정", description = "기존 이벤트를 수정합니다")
@@ -74,12 +74,12 @@ public class EventController {
     @ApiResponse(responseCode = "404", description = "이벤트를 찾을 수 없음",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{eventId}")
-    public ResponseEntity<Void> updateEvent(
+    public ResponseEntity<CommonResponse> updateEvent(
             @Parameter(description = "수정할 이벤트의 ID") @PathVariable String eventId,
             @RequestBody EventUpdateRequest updateInfo,
             @LoginedUser AuthenticatedUserDto userInfo
     ){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new CommonResponse(200, null));
     }
 
     @Operation(summary = "이벤트 구독", description = "현재 사용자를 특정 이벤트에 구독시킵니다")
@@ -89,11 +89,11 @@ public class EventController {
     @ApiResponse(responseCode = "404", description = "이벤트를 찾을 수 없음",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/{eventId}/subscribe")
-    public ResponseEntity<Void> subscribe(
+    public ResponseEntity<CommonResponse> subscribe(
             @Parameter(description = "구독할 이벤트의 ID") @PathVariable String eventId,
             @LoginedUser AuthenticatedUserDto userInfo
     ){
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse(201, null));
     }
 
     @Operation(summary = "이벤트 구독 취소", description = "현재 사용자의 특정 이벤트 구독을 취소합니다")
@@ -101,11 +101,11 @@ public class EventController {
     @ApiResponse(responseCode = "404", description = "구독 또는 이벤트를 찾을 수 없음",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @DeleteMapping("/{eventId}/subscribe")
-    public ResponseEntity<Void> cancelSubscribe(
+    public ResponseEntity<CommonResponse> cancelSubscribe(
             @Parameter(description = "구독 취소할 이벤트의 ID") @PathVariable String eventId,
             @LoginedUser AuthenticatedUserDto userInfo
     ){
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(new CommonResponse(200, null));
     }
 
 
@@ -116,21 +116,29 @@ public class EventController {
     @ApiResponse(responseCode = "404", description = "이벤트를 찾을 수 없음",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/{eventId}/check")
-    public ResponseEntity<Void> checkEvent(
+    public ResponseEntity<CommonResponse> checkEvent(
             @Parameter(description = "완료할 이벤트의 ID") @PathVariable String eventId,
             @LoginedUser AuthenticatedUserDto userInfo
     ){
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse(201, null));
     }
 
     public static class EventListResponse extends CommonResponse<List<EventSearchResponse>> {
-        public EventListResponse(List<EventSearchResponse> data) {
-            super(data);
+        public EventListResponse(int code, String message, List<EventSearchResponse> data) {
+            super(code, message, data);
+        }
+
+        public EventListResponse(int code, List<EventSearchResponse> data) {
+            super(code, data);
         }
     }
     public static class EventDetailResponse extends CommonResponse<EventDetailSearchResponse> {
-        public EventDetailResponse(EventDetailSearchResponse data) {
-            super(data);
+        public EventDetailResponse(int code, String message, EventDetailSearchResponse data) {
+            super(code, message, data);
+        }
+
+        public EventDetailResponse(int code, EventDetailSearchResponse data) {
+            super(code, data);
         }
     }
 }
