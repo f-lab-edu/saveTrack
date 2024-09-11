@@ -34,7 +34,7 @@ public class JwtUtils {
         Date expiryDate = new Date(issueTime.getTime() + expireTime);
 
         return Jwts.builder()
-                .subject(userInfo.getUid())
+                .subject(String.valueOf(userInfo.getId()))
                 .claim(EMAIL_CLAIM_NAME, userInfo.getEmail())
                 .claim(NICKNAME_CLAIM_NAME, userInfo.getNickname())
                 .issuedAt(issueTime)
@@ -69,7 +69,7 @@ public class JwtUtils {
 
 
         return new AuthenticatedUserDto(
-                payload.getSubject(),
+                Long.parseLong(payload.getSubject()),
                 payload.get(EMAIL_CLAIM_NAME, String.class),
                 payload.get(NICKNAME_CLAIM_NAME, String.class)
         );

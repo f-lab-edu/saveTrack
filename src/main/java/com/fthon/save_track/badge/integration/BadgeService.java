@@ -1,11 +1,11 @@
-package com.fthon.save_track.badge.service;
+package com.fthon.save_track.badge.integration;
 
 
 import com.fthon.save_track.badge.dto.AcquiredBadgeDto;
+import com.fthon.save_track.badge.dto.BadgeSearchResponse;
 import com.fthon.save_track.badge.persistence.Badge;
 import com.fthon.save_track.badge.repository.BadgeRepository;
 import com.fthon.save_track.user.persistence.User;
-import com.fthon.save_track.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +19,7 @@ import java.util.List;
 public class BadgeService {
 
     private final BadgeRepository badgeRepository;
+
 
     /**
      * 특정 이벤트를 완료한 후 실행하는 메서드로, 사용자가 뱃지를 얻을 수 있는지 확인하고 얻은 뱃지를 DB에 저장 후 해당 뱃지 정보를 반환합니다
@@ -40,4 +41,13 @@ public class BadgeService {
     }
 
 
+    /**
+     * 뱃지의 전체 리스트를 조회. 사용자가 얻었는지의 정보가 포함되어 있음.
+     * @author minseok kim
+     * @param
+     * @throws
+    */
+    public List<BadgeSearchResponse> getBadges(Long userId) {
+        return badgeRepository.findAllBadgesByUserId(userId);
+    }
 }

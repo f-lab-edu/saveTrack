@@ -33,7 +33,7 @@ public class LoginedUserArgumentResolver implements HandlerMethodArgumentResolve
 
         // 개발 단계에서 임시로 사용할 객체
         return new AuthenticatedUserDto(
-                "user-001",
+                1L,
                 "useremail@email.com",
                 "test"
         );

@@ -40,7 +40,7 @@ public class AuthService {
 
         return jwtUtils.sign(
                 new AuthenticatedUserDto(
-                        user.getId().toString(),
+                        user.getId(),
                         user.getEmail(),
                         user.getNickname()
                 ),
