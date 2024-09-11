@@ -16,7 +16,7 @@ public class AuthenticatedUserDto {
 
     public static AuthenticatedUserDto of(User user){
         return new AuthenticatedUserDto(
-                Long.toString(user.getId()),
+                user.getId(),
                 user.getEmail(),
                 user.getNickname()
         );
