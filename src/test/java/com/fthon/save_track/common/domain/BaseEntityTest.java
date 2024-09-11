@@ -45,7 +45,7 @@ class BaseEntityTest {
 
     @DisplayName("BaseEntity를 업데이트할 시 UpdatedAt을 자동으로 설정한다.")
     @Test
-    void testUpdatedAtSet(){
+    void testUpdatedAtSet() throws Exception {
         TestEntity te = new TestEntity();
 
         em.persist(te);
@@ -53,6 +53,7 @@ class BaseEntityTest {
         ZonedDateTime updatedAt1 = te.getUpdatedAt();
         te.testField = 1;
 
+        Thread.sleep(1000);
         em.persist(te);
         em.flush();
         assertThat(te.getUpdatedAt()).isNotEqualTo(updatedAt1);
