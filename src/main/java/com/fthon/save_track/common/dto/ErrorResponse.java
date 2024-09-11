@@ -1,14 +1,13 @@
 package com.fthon.save_track.common.dto;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
+import lombok.*;
+
+import java.util.Arrays;
 
 @AllArgsConstructor
 @Builder
-@Data
+@Getter
 public class ErrorResponse extends CommonResponse<ErrorResponse.ErrorInfo> {
 
     public ErrorResponse(int code, String message, ErrorInfo data) {
@@ -21,7 +20,13 @@ public class ErrorResponse extends CommonResponse<ErrorResponse.ErrorInfo> {
 
     @AllArgsConstructor
     @Getter
+    @NoArgsConstructor
     public static class ErrorInfo {
-        private final String[] stackTrace;
+        private String[] stackTrace;
+
+        public static ErrorInfo of(StackTraceElement[] stackTraceElements){
+
+            return new ErrorInfo(Arrays.stream(stackTraceElements).map(StackTraceElement::toString).toArray(String[]::new));
+        }
     }
 }

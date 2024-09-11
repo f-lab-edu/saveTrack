@@ -62,7 +62,7 @@ public class UserService {
         return user.getLogs().stream().filter(log->
                 {
                     ZonedDateTime startDateTime = ZonedDateTime.of(startDate, LocalTime.MIN, log.getCreatedAt().getZone());
-                    ZonedDateTime endDateTime = ZonedDateTime.of(endDate, LocalTime.MIN, log.getCreatedAt().getZone());
+                    ZonedDateTime endDateTime = ZonedDateTime.of(endDate, LocalTime.MAX, log.getCreatedAt().getZone());
                     return
                             isEqualOrAfter(log.getCreatedAt(), startDateTime) &&
                             isEqualOrBefore(log.getCreatedAt(), endDateTime);
@@ -76,7 +76,7 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(email);
 
         if(user.isEmpty()){
-            throw new RuntimeException("유저를 조회할 수 없습니다.");
+            throw new UnAuthorizedException("유저를 조회할 수 없습니다.");
         }
 
         return jwtUtils.sign(AuthenticatedUserDto.of(user.get()), new Date());
