@@ -3,6 +3,10 @@ package com.fthon.save_track.event.controller;
 
 import com.fthon.save_track.common.dto.CommonResponse;
 import com.fthon.save_track.common.dto.ErrorResponse;
+import com.fthon.save_track.common.response.APIResponse;
+import com.fthon.save_track.common.response.ApiResponseBody;
+import com.fthon.save_track.common.response.ApiResponseGenerator;
+import com.fthon.save_track.common.response.MessageCode;
 import com.fthon.save_track.event.application.dto.request.CreateCategoryRequest;
 import com.fthon.save_track.event.application.dto.response.CategorySearchResponse;
 import com.fthon.save_track.event.application.service.CategoryService;
@@ -13,6 +17,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
