@@ -66,7 +66,6 @@ class AuthServiceTest {
 
         User user = new User(
                 kakaoUserInfo.getKakaoAccount().getName(),
-                UUID.randomUUID().toString(),
                 kakaoUserInfo.getId(),
                 kakaoUserInfo.getKakaoAccount().getEmail()
         );
