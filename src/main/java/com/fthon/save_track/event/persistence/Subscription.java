@@ -1,6 +1,7 @@
 package com.fthon.save_track.event.persistence;
 
 import com.fthon.save_track.common.domain.BaseEntity;
+import com.fthon.save_track.user.persistence.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,5 +19,8 @@ public class Subscription extends BaseEntity {
     @JoinColumn(name = "event_id")
     private Event eventEntity;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User userEntity;
 
 }
