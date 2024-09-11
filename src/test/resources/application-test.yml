@@ -21,3 +21,9 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true

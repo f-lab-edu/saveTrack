@@ -23,13 +23,13 @@ class JwtUtilsTest {
     @DisplayName("JWT 토큰을 생성하고 Parsing 할 수 있다.")
     void testCreateAndParse() throws Exception{
         // given
-        AuthenticatedUserDto givenUser = new AuthenticatedUserDto("userUid", "email", "nickname");
+        AuthenticatedUserDto givenUser = new AuthenticatedUserDto(1L, "email", "nickname");
         // when
         String jwt = jwtUtils.sign(givenUser, new Date());
         // then
         AuthenticatedUserDto parsedUser = jwtUtils.getUser(jwt);
 
-        assertThat(parsedUser.getUid()).isEqualTo(givenUser.getUid());
+        assertThat(parsedUser.getId()).isEqualTo(givenUser.getId());
         assertThat(parsedUser.getEmail()).isEqualTo(givenUser.getEmail());
         assertThat(parsedUser.getNickname()).isEqualTo(givenUser.getNickname());
     }
@@ -53,7 +53,7 @@ class JwtUtilsTest {
 
     private static Stream<Arguments> createJwtVerifyInput(){
         JwtUtils jwtUtils = new JwtUtils(secretKey, 1000000L);
-        AuthenticatedUserDto userInfo = new AuthenticatedUserDto("userUid", "email", "nickname");
+        AuthenticatedUserDto userInfo = new AuthenticatedUserDto(1L, "email", "nickname");
 
         String goodJwt = jwtUtils.sign(userInfo, new Date());
         String expiredJwt = jwtUtils.sign(userInfo, new Date(0));
