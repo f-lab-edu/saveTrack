@@ -12,24 +12,20 @@ public class KakaoOAuth2Client {
 
     private final String kakaoOAuth2InfoUrl;
 
-    private final String kakaoOauth2AdminKey;
-
     private final RestClient restClient;
 
     public KakaoOAuth2Client(
             @Value("${service.oauth2.kakao.info-url}") String kakaoOAuth2InfoUrl,
-            @Value("${service.oauth2.kakao.admin-key}") String kakaoOauth2AdminKey,
             RestClient restClient
             ) {
         this.kakaoOAuth2InfoUrl = kakaoOAuth2InfoUrl;
-        this.kakaoOauth2AdminKey = kakaoOauth2AdminKey;
         this.restClient = restClient;
     }
 
     public KakaoUserInfo getUserInfo(String token){
         return restClient.get()
                 .uri(kakaoOAuth2InfoUrl)
-                .header("Authorization", "Bearer " + kakaoOauth2AdminKey)
+                .header("Authorization", "Bearer " + token)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .body(KakaoUserInfo.class);

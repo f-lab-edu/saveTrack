@@ -85,7 +85,7 @@ public class UserService {
 
     private User saveProcess(KakaoUserInfo kakaoUserInfo){
         User user = new User(
-                kakaoUserInfo.getKakaoAccount().getName(),
+                kakaoUserInfo.getKakaoAccount().getProfile().getNickname(),
                 kakaoUserInfo.getId(),
                 kakaoUserInfo.getKakaoAccount().getEmail()
         );
