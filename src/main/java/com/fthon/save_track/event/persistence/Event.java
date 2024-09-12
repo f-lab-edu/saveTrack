@@ -29,6 +29,9 @@ public class Event extends BaseEntity {
     @JoinColumn(name = "subscription_id")
     private List<Subscription> subscribeEntity;
 
+    @Builder.Default
+    private boolean eventFinish = false;
+
     private String eventName;
     private String eventContent;
     private String morningCheerMessage;
@@ -39,5 +42,9 @@ public class Event extends BaseEntity {
         eventName = event.getEventName();
         eventContent = event.getEventContent();
         return this;
+    }
+
+    public void finish() {
+        this.eventFinish = true;
     }
 }
