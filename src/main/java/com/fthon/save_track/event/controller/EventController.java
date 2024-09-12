@@ -40,14 +40,14 @@ public class EventController {
 
     @Operation(summary = "이벤트 목록 조회", description = "페이지네이션과 선택적 카테고리 필터를 기반으로 이벤트 목록을 조회합니다")
     @ApiResponse(responseCode = "200", description = "성공적으로 조회됨")
-            //content = @Content(schema = @Schema(implementation = EventListResponse.class)))
+    //content = @Content(schema = @Schema(implementation = EventListResponse.class)))
     @ApiResponse(responseCode = "400", description = "잘못된 요청",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("")
     public APIResponse<ApiResponseBody.SuccessBody<List<Event>>> getList(
-            @Parameter(description = "페이지 번호 (0부터 시작)") @RequestParam(required = false, defaultValue = "0") int page,
-            @Parameter(description = "페이지당 항목 수") @RequestParam(required = false, defaultValue = "10") int size,
-            @Parameter(description = "필터링을 위한 카테고리 ID") @RequestParam(required = false) String categoryId
+            //@Parameter(description = "페이지 번호 (0부터 시작)") @RequestParam(required = false, defaultValue = "0") int page,
+            //@Parameter(description = "페이지당 항목 수") @RequestParam(required = false, defaultValue = "10") int size,
+            //@Parameter(description = "필터링을 위한 카테고리 ID") @RequestParam(required = false) String categoryId
     ){
         List<Event> response = eventService.getListEvent();
         return ApiResponseGenerator.success(response, HttpStatus.OK, MessageCode.GET);
@@ -55,7 +55,7 @@ public class EventController {
 
     @Operation(summary = "이벤트 상세 정보 조회", description = "특정 이벤트의 상세 정보를 조회합니다")
     @ApiResponse(responseCode = "200", description = "성공적으로 조회됨")
-            //content = @Content(schema = @Schema(implementation = EventDetailResponse.class)))
+    //content = @Content(schema = @Schema(implementation = EventDetailResponse.class)))
     @ApiResponse(responseCode = "404", description = "이벤트를 찾을 수 없음",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/{eventId}")
@@ -121,9 +121,10 @@ public class EventController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/{eventId}/subscribe")
     public ResponseEntity<CommonResponse> subscribe(
-            @Parameter(description = "구독할 이벤트의 ID") @PathVariable String eventId,
+            @Parameter(description = "구독할 이벤트의 ID") @PathVariable Long eventId,
             @LoginedUser AuthenticatedUserDto userInfo
     ){
+        eventService.subscribe(eventId, userInfo.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse(201, null));
     }
 
