@@ -45,9 +45,9 @@ public class EventController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("")
     public APIResponse<ApiResponseBody.SuccessBody<List<Event>>> getList(
-            //@Parameter(description = "페이지 번호 (0부터 시작)") @RequestParam(required = false, defaultValue = "0") int page,
-            //@Parameter(description = "페이지당 항목 수") @RequestParam(required = false, defaultValue = "10") int size,
-            //@Parameter(description = "필터링을 위한 카테고리 ID") @RequestParam(required = false) String categoryId
+            @Parameter(description = "페이지 번호 (0부터 시작)") @RequestParam(required = false, defaultValue = "0") int page,
+            @Parameter(description = "페이지당 항목 수") @RequestParam(required = false, defaultValue = "10") int size,
+            @Parameter(description = "필터링을 위한 카테고리 ID") @RequestParam(required = false) String categoryId
     ){
         List<Event> response = eventService.getListEvent();
         return ApiResponseGenerator.success(response, HttpStatus.OK, MessageCode.GET);
@@ -127,6 +127,17 @@ public class EventController {
         eventService.subscribe(eventId, userInfo.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse(201, null));
     }
+
+    @PostMapping("/finish/{eventId}")
+    public ResponseEntity<CommonResponse> finishEvent(
+            @PathVariable Long eventId,
+            @LoginedUser AuthenticatedUserDto userInfo
+    ) {
+      eventService.finishEvent(eventId, userInfo.getId());
+      return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse(201, null));
+    }
+
+
 
     @Operation(summary = "이벤트 구독 취소", description = "현재 사용자의 특정 이벤트 구독을 취소합니다")
     @ApiResponse(responseCode = "200", description = "구독이 성공적으로 취소됨")
