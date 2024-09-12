@@ -3,17 +3,27 @@ package com.fthon.save_track.auth.service;
 import com.fthon.save_track.auth.dto.KakaoUserInfo;
 import com.fthon.save_track.auth.dto.OAuth2LoginRequest;
 import com.fthon.save_track.auth.service.client.KakaoOAuth2Client;
+import com.fthon.save_track.common.domain.BaseEntity;
+import com.fthon.save_track.event.persistence.Event;
+import com.fthon.save_track.user.dto.UserEventLogDto;
 import com.fthon.save_track.user.persistence.User;
+import com.fthon.save_track.user.persistence.UserEventLog;
 import com.fthon.save_track.user.repository.UserRepository;
+import com.fthon.save_track.user.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
+import java.lang.reflect.Field;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,12 +33,12 @@ import static org.mockito.BDDMockito.given;
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
-class AuthServiceTest {
+class UserServiceTest {
 
     @Autowired
-    private AuthService authService;
+    private UserService userService;
 
-    @Autowired
+    @SpyBean
     private UserRepository userRepository;
 
     @MockBean
@@ -49,7 +59,7 @@ class AuthServiceTest {
                 "token"
         );
 
-        String result = authService.doOAuth2Login(reqBody);
+        String result = userService.doOAuth2Login(reqBody);
 
         //then
         assertThat(result).isNotNull();
@@ -77,10 +87,49 @@ class AuthServiceTest {
                 "token"
         );
 
-        String result = authService.doOAuth2Login(reqBody);
+        String result = userService.doOAuth2Login(reqBody);
 
         //then
         assertThat(result).isNotNull();
+    }
+
+    @Test
+    @DisplayName("유저의 이벤트 로그를 특정 날짜 범위로 조회할 수 있다.")
+    public void testGetUserLogListDateIn() throws Exception{
+        //given
+        User user = new User();
+        Event event = new Event();
+
+        for(int i = 0; i < 3; i++){
+            user.addLog(event, true);
+        }
+
+        ZonedDateTime dateTime = ZonedDateTime.of(2024, 9, 11, 0, 0, 0, 0, ZoneOffset.UTC);
+        List<ZonedDateTime> dateTimes = List.of(
+                dateTime,
+                dateTime.plusDays(1),
+                dateTime.plusDays(2)
+        );
+
+        for(int i = 0; i < 3; i++){
+            UserEventLog log = user.getLogs().get(i);
+            Field createdAtField = BaseEntity.class.getDeclaredField("createdAt");
+            createdAtField.setAccessible(true);
+            createdAtField.set(log, dateTimes.get(i));
+        }
+
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
+
+        //when
+        List<UserEventLogDto> actual = userService.getEventLogDateIn(1L, dateTime.plusDays(1).toLocalDate(), dateTime.plusDays(2).toLocalDate());
+
+        //then
+        List<UserEventLogDto> expected = List.of(
+                UserEventLogDto.of(user.getLogs().get(1)),
+                UserEventLogDto.of(user.getLogs().get(2))
+        );
+
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     private KakaoUserInfo createDummyKakaoUserInfo(){
