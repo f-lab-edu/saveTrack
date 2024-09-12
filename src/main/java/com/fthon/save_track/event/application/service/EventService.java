@@ -89,5 +89,12 @@ public class EventService {
     // 여기서 Event사용해서 이벤트 목표를 달성했다면 ? isChecked를 false -> true로 바꾸는 로직 추가해 보려고 합니다.
 
 
+    @Transactional
+    public void finishEvent(Long eventId, Long userId) {
+        Event event = getEvent(eventId);
+        event.finish();
+        eventRepository.save(event);
+    }
+
 
 }
