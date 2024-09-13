@@ -168,7 +168,8 @@ class UserServiceTest {
                 "content",
                 "morning",
                 "afternoon",
-                "evening"
+                "evening",
+                List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY)
         );
 
         Subscription s1 = user.addSubscription(event1);
@@ -200,9 +201,16 @@ class UserServiceTest {
                 "eventName",
                 "morningMessage",
                 "afternoonMessage",
-                "eveningMessage"
+                "eveningMessage",
+                "notificationDayOfWeeks"
         ).containsExactly(
-                Tuple.tuple("name", "morning", "afternoon", "evening")
+                Tuple.tuple(
+                        "name",
+                        "morning",
+                        "afternoon",
+                        "evening",
+                        List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY)
+                )
         );
     }
 

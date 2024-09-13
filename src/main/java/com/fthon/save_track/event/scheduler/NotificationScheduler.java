@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -22,9 +24,10 @@ public class NotificationScheduler {
     @Scheduled(cron = "0 0 8 * * ?")
     public void sendMorningNotifications(){
         List<UserSubscriptionInfoDto> subscriptions = userService.getCurrentSubscribes(ZonedDateTime.now());
+        DayOfWeek dayOfWeek = LocalDate.now().getDayOfWeek();
 
         subscriptions.forEach(user->
-                user.getSubscribeEvents().forEach(e->
+                user.getSubscribeEvents().stream().filter(e->e.getNotificationDayOfWeeks().contains(dayOfWeek)).forEach(e->
                         pushService.sendNotification(user.getUserDeviceToken(), String.format("%s에서 보낸 메시지입니다! %s", e.getEventName(), e.getAfternoonMessage()))
                 )
         );
