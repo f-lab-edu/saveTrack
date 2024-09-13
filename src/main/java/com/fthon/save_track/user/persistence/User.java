@@ -28,11 +28,12 @@ public class User extends BaseEntity {
     @Column(unique = true)
     private String email;
 
-
-    public User(String nickname, Long kakaoId, String email) {
+    private String deviceToken;
+    public User(String nickname, Long kakaoId, String email, String deviceToken) {
         this.nickname = nickname;
         this.kakaoId = kakaoId;
         this.email = email;
+        this.deviceToken = deviceToken;
     }
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userEntity")

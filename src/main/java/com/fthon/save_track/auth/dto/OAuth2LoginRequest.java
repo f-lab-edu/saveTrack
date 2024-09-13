@@ -12,5 +12,6 @@ public class OAuth2LoginRequest {
 
     private String provider;
     private String accessToken;
+    private String deviceToken;
 
 }

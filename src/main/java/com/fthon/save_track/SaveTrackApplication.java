@@ -43,7 +43,7 @@ public class SaveTrackApplication {
 			eventRepository.deleteAll();
 			categoryRepository.deleteAll();
 
-			User user = new User("테스트 유저", 12312421L, "test@email.com");
+			User user = new User("테스트 유저", 12312421L, "test@email.com", "asdsadsad");
 			Category category1 = new Category("물 절약");
 			Category category2 = new Category("돈 절약");
 

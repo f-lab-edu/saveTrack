@@ -52,12 +52,13 @@ class UserServiceTest {
         //given
         KakaoUserInfo kakaoUserInfo = createDummyKakaoUserInfo();
         given(kakaoOAuth2Client.getUserInfo(any())).willReturn(kakaoUserInfo);
-
+        String deviceToken = "asdsfs";
 
         //when
         OAuth2LoginRequest reqBody = new OAuth2LoginRequest(
                 "kakao",
-                "token"
+                "token",
+                deviceToken
         );
 
         String result = userService.doOAuth2Login(reqBody);
@@ -74,18 +75,21 @@ class UserServiceTest {
         //given
         KakaoUserInfo kakaoUserInfo = createDummyKakaoUserInfo();
         given(kakaoOAuth2Client.getUserInfo(any())).willReturn(kakaoUserInfo);
-
+        String deviceToken = "asdsfs";
         User user = new User(
                 kakaoUserInfo.getKakaoAccount().getName(),
                 kakaoUserInfo.getId(),
-                kakaoUserInfo.getKakaoAccount().getEmail()
+                kakaoUserInfo.getKakaoAccount().getEmail(),
+                deviceToken
         );
         userRepository.save(user);
 
         //when
+
         OAuth2LoginRequest reqBody = new OAuth2LoginRequest(
                 "kakao",
-                "token"
+                "token",
+                deviceToken
         );
 
         String result = userService.doOAuth2Login(reqBody);

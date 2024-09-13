@@ -105,7 +105,7 @@ class BadgeIntegrationTest {
     @DisplayName("뱃지 전체 리스트를 조회할 수 있다.")
     void testSearchBadges() throws Exception{
         // given
-        User user = new User("유저", 123L, "email@email.com");
+        User user = new User("유저", 123L, "email@email.com", "asdsad");
         Category category = new Category("카테고리 1");
 
         Event event = new Event(category, List.of(), false, "이벤트", "내용", "메시지1", "메시지2", "메시지3");

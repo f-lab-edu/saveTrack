@@ -44,7 +44,7 @@ public class UserService {
 
         Optional<User> savedUser = userRepository.findByKakaoId(result.getId());
 
-        User user = savedUser.orElseGet(()->saveProcess(result));
+        User user = savedUser.orElseGet(()->saveProcess(result, loginRequest.getDeviceToken()));
 
         return jwtUtils.sign(
                 new AuthenticatedUserDto(
@@ -85,11 +85,12 @@ public class UserService {
     }
 
 
-    private User saveProcess(KakaoUserInfo kakaoUserInfo){
+    private User saveProcess(KakaoUserInfo kakaoUserInfo, String deviceToken){
         User user = new User(
                 kakaoUserInfo.getKakaoAccount().getName(),
                 kakaoUserInfo.getId(),
-                kakaoUserInfo.getKakaoAccount().getEmail()
+                kakaoUserInfo.getKakaoAccount().getEmail(),
+                deviceToken
         );
 
         userRepository.save(user);
