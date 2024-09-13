@@ -31,6 +31,7 @@ public class ReportService {
         return eventLogs.stream().map(dto->
                 new ReportDateResponse(
                     dto.getEventId(),
+                    dto.getCategoryId(),
                     dto.getCheckTime().toInstant().getEpochSecond(),
                     dto.getEventName(),
                     dto.isCheck(),

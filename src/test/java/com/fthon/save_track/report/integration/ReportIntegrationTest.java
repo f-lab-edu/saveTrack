@@ -63,7 +63,7 @@ public class ReportIntegrationTest {
     public void testGetReport() throws Exception{
         //given
         User user = new User();
-        Category category = new Category();
+        Category category = new Category("category-001", "카테고리");
 
         Event event1 = new Event(category, List.of(), false,  "이벤트", "내용", "메시지1", "메시지2", "메시지3", List.of());
         Event event2 = new Event(category, List.of(), false, "이벤트2", "내용", "메시지1", "메시지2", "메시지3", List.of());
@@ -98,8 +98,8 @@ public class ReportIntegrationTest {
         ReportController.ReportListResponse actual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ReportController.ReportListResponse.class);
 
         List<ReportDateResponse> expectedEndDateData = List.of(
-                new ReportDateResponse(event1.getId(), l1.getCreatedAt().toInstant().toEpochMilli(), event1.getEventName(), l1.isChecked(), l1.getCreatedAt()),
-                new ReportDateResponse(event2.getId(), l2.getCreatedAt().toInstant().toEpochMilli(), event2.getEventName(), l2.isChecked(), l2.getCreatedAt())
+                new ReportDateResponse(event1.getId(), category.getUid(), l1.getCreatedAt().toInstant().toEpochMilli(), event1.getEventName(), l1.isChecked(), l1.getCreatedAt()),
+                new ReportDateResponse(event2.getId(), category.getUid(), l2.getCreatedAt().toInstant().toEpochMilli(), event2.getEventName(), l2.isChecked(), l2.getCreatedAt())
         );
 
 

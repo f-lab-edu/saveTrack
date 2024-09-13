@@ -14,6 +14,7 @@ import java.util.Objects;
 public class UserEventLogDto {
 
     private final Long eventId;
+    private final String categoryId;
     private final String eventName;
     private boolean isCheck;
     private ZonedDateTime checkTime;
@@ -21,6 +22,7 @@ public class UserEventLogDto {
     public static UserEventLogDto of(UserEventLog log){
         return new UserEventLogDto(
                 log.getSubscription().getEventEntity().getId(),
+                log.getSubscription().getEventEntity().getCategory().getUid(),
                 log.getSubscription().getEventEntity().getEventName(),
                 log.isChecked(),
                 log.getCreatedAt()

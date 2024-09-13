@@ -4,6 +4,7 @@ import com.fthon.save_track.auth.dto.KakaoUserInfo;
 import com.fthon.save_track.auth.dto.OAuth2LoginRequest;
 import com.fthon.save_track.auth.service.client.KakaoOAuth2Client;
 import com.fthon.save_track.common.domain.BaseEntity;
+import com.fthon.save_track.event.persistence.Category;
 import com.fthon.save_track.event.persistence.Event;
 import com.fthon.save_track.event.persistence.EventRepository;
 import com.fthon.save_track.event.persistence.Subscription;
@@ -108,7 +109,8 @@ class UserServiceTest {
     public void testGetUserLogListDateIn() throws Exception{
         //given
         User user = new User();
-        Event event = new Event();
+        Category category = new Category("c1", "c");
+        Event event = new Event(category, List.of(), false, "name", "content", "", "", "", List.of());
 
         Subscription subscription = user.addSubscription(event);
 

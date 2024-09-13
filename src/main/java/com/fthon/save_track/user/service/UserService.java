@@ -142,6 +142,7 @@ public class UserService {
                             .map(UserEventLogDto::of) // 로그가 있으면 해당 로그를 Dto로 변환
                             .orElseGet(() -> new UserEventLogDto(
                                     subscription.getEventEntity().getId(),
+                                    subscription.getEventEntity().getCategory().getUid(),
                                     subscription.getEventEntity().getEventName(),
                                     false,
                                     ZonedDateTime.of(date, LocalTime.MIN, ZoneId.systemDefault())
