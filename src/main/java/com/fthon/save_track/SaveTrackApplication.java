@@ -14,11 +14,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @SpringBootApplication
+@EnableScheduling
 public class SaveTrackApplication {
 
 	public static void main(String[] args) {
@@ -28,6 +31,7 @@ public class SaveTrackApplication {
 
 	@Component
 	@RequiredArgsConstructor
+	@Profile("!test")
 	protected class InitCommandLineRunner implements CommandLineRunner{
 
 		private final UserRepository userRepository;
@@ -43,7 +47,7 @@ public class SaveTrackApplication {
 			eventRepository.deleteAll();
 			categoryRepository.deleteAll();
 
-			User user = new User("테스트 유저", 12312421L, "test@email.com");
+			User user = new User("테스트 유저", 12312421L, "test@email.com", "asdsadsad");
 			Category category1 = new Category("물 절약");
 			Category category2 = new Category("돈 절약");
 

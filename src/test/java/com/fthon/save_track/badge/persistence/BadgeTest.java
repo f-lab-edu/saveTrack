@@ -47,7 +47,7 @@ class BadgeTest {
         //given
         BadgeChallengeStrategy strategy = new TotalCategoryCountStrategy(1);
         Badge badge = new Badge("뱃지 1", strategy);
-        User user = new User("nickname", 1234L, "email@email.com");
+        User user = new User("nickname", 1234L, "email@email.com", "asdadfsa");
         Event event = new Event();
 
         Subscription subscription = user.addSubscription(event);
@@ -69,7 +69,7 @@ class BadgeTest {
         //given
         BadgeChallengeStrategy strategy = new TotalCategoryCountStrategy(1);
         Badge badge = new Badge("뱃지 1", strategy);
-        User user = new User("nickname", 1234L, "email@email.com");
+        User user = new User("nickname", 1234L, "email@email.com", "asdadfsa");
         Event event = new Event();
 
         Subscription subscription = user.addSubscription(event);
@@ -93,7 +93,7 @@ class BadgeTest {
         BadgeChallengeStrategy strategy = new IndividualCategoryCountStrategy(1, category);
 
         Badge badge = new Badge("뱃지 1", strategy);
-        User user = new User("nickname", 1234L, "email@email.com");
+        User user = new User("nickname", 1234L, "email@email.com", "asdadfsa");
         Event event = new Event(category, List.of(), false, "이벤트", "내용", "메시지1","메시지2","메시지3");
         Event event2 = new Event();
 
@@ -122,7 +122,7 @@ class BadgeTest {
         BadgeChallengeStrategy strategy = new IndividualCategoryCountStrategy(1, category);
 
         Badge badge = new Badge("뱃지 1", strategy);
-        User user = new User("nickname", 1234L, "email@email.com");
+        User user = new User("nickname", 1234L, "email@email.com", "asdadfsa");
         Event event = new Event(category, List.of(), false, "이벤트", "내용", "메시지1","메시지2","메시지3");
 
         Subscription subscription = user.addSubscription(event);

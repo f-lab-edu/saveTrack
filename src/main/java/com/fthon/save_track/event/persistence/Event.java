@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.DayOfWeek;
 import java.util.List;
 
 @Entity
@@ -38,6 +39,13 @@ public class Event extends BaseEntity {
     private String afternoonCheerMessage;
     private String eveningCheerMessage;
 
+    @ElementCollection(targetClass = DayOfWeek.class)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable(name = "event_noti_day_of_week", joinColumns = @JoinColumn(name = "event_id"))
+    @Column(name = "noti_day_of_week")
+    private List<DayOfWeek> daysOfWeek;
+
+    
     public Event update(EventUpdateRequest event) {
         eventName = event.getEventName();
         eventContent = event.getEventContent();
