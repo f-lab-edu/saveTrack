@@ -1,5 +1,6 @@
 package com.fthon.save_track.event.application.service;
 
+import com.fthon.save_track.common.exceptions.BadRequestException;
 import com.fthon.save_track.event.application.dto.request.EventCreateRequest;
 import com.fthon.save_track.event.application.dto.request.EventUpdateRequest;
 import com.fthon.save_track.event.application.dto.response.getDatailEventResponse;
@@ -8,6 +9,7 @@ import com.fthon.save_track.event.persistence.EventRepository;
 import com.fthon.save_track.event.persistence.Subscription;
 import com.fthon.save_track.event.persistence.SubscriptionRepository;
 import com.fthon.save_track.user.persistence.User;
+import com.fthon.save_track.user.persistence.UserEventLog;
 import com.fthon.save_track.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +19,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -42,14 +48,11 @@ public class EventService {
     public void updateEvent(final EventUpdateRequest request, final Long eventId) {
         Event data = getEvent(eventId);
         Event event = data.update(request);
-        eventRepository.save(event);
-
     }
 
     @Transactional
     public void deleteEvent(final Long eventId) {
-        Event data = getEvent(eventId);
-        eventRepository.deleteById(data.getId());
+        eventRepository.softDeleteEvent(eventId);
     }
 
     // 돌아오면 여기서부터 개발하면 됨
@@ -90,10 +93,19 @@ public class EventService {
 
 
     @Transactional
-    public void finishEvent(Long eventId, Long userId) {
-        Event event = getEvent(eventId);
-        event.finish();
-        eventRepository.save(event);
+    public void finishEvent(Long eventId, Long userId) throws BadRequestException {
+        Optional<Subscription> data = userRepository.findCurrentSubscription(userId, eventId, ZonedDateTime.now());
+        if (data.isEmpty()){
+            throw new BadRequestException("구독하지 않은 이벤트입니다.");
+        }
+        Subscription subscription = data.get();
+
+        subscription.getLogs().stream().filter(l-> LocalDate.now().isEqual(l.getCreatedAt().toLocalDate()))
+                .findAny().ifPresent((s)->{
+                    throw new BadRequestException("이미 완료 체크한 이벤트입니다.");
+                });
+
+        subscription.addLog(true);
     }
 
 
