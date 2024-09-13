@@ -3,6 +3,7 @@ package com.fthon.save_track.event.application.service;
 import com.fthon.save_track.common.exceptions.BadRequestException;
 import com.fthon.save_track.event.application.dto.request.EventCreateRequest;
 import com.fthon.save_track.event.application.dto.request.EventUpdateRequest;
+import com.fthon.save_track.event.application.dto.response.EventSearchResponse;
 import com.fthon.save_track.event.application.dto.response.getDatailEventResponse;
 import com.fthon.save_track.event.persistence.Event;
 import com.fthon.save_track.event.persistence.EventRepository;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,10 +60,27 @@ public class EventService {
 
     // 돌아오면 여기서부터 개발하면 됨
 
-    public List<Event> getListEvent() {
+    public List<EventSearchResponse> getListEvent(int page, int size, Long categoryId) {
         //Event event = getEvent(eventId);
-        List<Event> event= eventRepository.findAll();
-        return event;
+        if (categoryId == null) {
+            Page<Event> data = eventRepository.findAll(PageRequest.of(page, size));
+
+            return data.getContent().stream().map(e->new EventSearchResponse(
+                    e.getId(),
+                    e.getEventName(),
+                    e.getEventContent(),
+                    e.getDaysOfWeek(),
+                    e.getSubscribeEntity().size()
+            )).toList();
+        }
+            Page<Event> data = eventRepository.findByCategoryId(PageRequest.of(page, size), categoryId);
+        return data.getContent().stream().map(e->new EventSearchResponse(
+                e.getId(),
+                e.getEventName(),
+                e.getEventContent(),
+                e.getDaysOfWeek(),
+                e.getSubscribeEntity().size()
+        )).toList();
     }
 
     public Event getDetailEvent(Long eventId) {
