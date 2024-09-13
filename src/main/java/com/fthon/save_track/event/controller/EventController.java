@@ -70,7 +70,7 @@ public class EventController {
     @ApiResponse(responseCode = "201", description = "이벤트가 성공적으로 생성됨")
     @ApiResponse(responseCode = "400", description = "잘못된 입력",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    @PostMapping("/{eventId}")
+    @PostMapping()
     public APIResponse<ApiResponseBody.SuccessBody<Void>> createEvent(
             @Parameter(description = "생성할 이벤트의 ID") //@PathVariable String eventId,
             @RequestBody EventCreateRequest request,
