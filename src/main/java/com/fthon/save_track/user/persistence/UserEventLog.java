@@ -6,9 +6,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
 
-
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Entity
 @Getter
 public class UserEventLog extends BaseEntity {
