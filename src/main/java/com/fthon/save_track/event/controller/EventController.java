@@ -87,13 +87,13 @@ public class EventController {
     @ApiResponse(responseCode = "404", description = "이벤트를 찾을 수 없음",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{eventId}")
-    public APIResponse<ApiResponseBody.SuccessBody<Void>> updateEvent(
+    public ResponseEntity<CommonResponse> updateEvent(
             @Parameter(description = "수정할 이벤트의 ID") @PathVariable Long eventId,
             @RequestBody EventUpdateRequest request,
             @LoginedUser AuthenticatedUserDto userInfo
     ){
         eventService.updateEvent(request, eventId);
-        return ApiResponseGenerator.success(HttpStatus.OK, MessageCode.UPDATE);
+        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse(200, null));
     }
 
 
@@ -104,12 +104,13 @@ public class EventController {
     @ApiResponse(responseCode = "404", description = "이벤트를 찾을 수 없음",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @DeleteMapping("/{eventId}")
-    public APIResponse<ApiResponseBody.SuccessBody<Void>> deleteEvent(
+    public ResponseEntity<CommonResponse> deleteEvent(
             @Parameter(description = "수정할 이벤트의 ID") @PathVariable Long eventId,
             @LoginedUser AuthenticatedUserDto userInfo
     ){
         eventService.deleteEvent(eventId);
-        return ApiResponseGenerator.success(HttpStatus.OK, MessageCode.DELETE);
+        //return ApiResponseGenerator.success(HttpStatus.OK, MessageCode.DELETE);
+        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse(200, null));
     }
 
 
@@ -127,16 +128,6 @@ public class EventController {
         eventService.subscribe(eventId, userInfo.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse(201, null));
     }
-
-    @PostMapping("/finish/{eventId}")
-    public ResponseEntity<CommonResponse> finishEvent(
-            @PathVariable Long eventId,
-            @LoginedUser AuthenticatedUserDto userInfo
-    ) {
-      eventService.finishEvent(eventId, userInfo.getId());
-      return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse(201, null));
-    }
-
 
 
     @Operation(summary = "이벤트 구독 취소", description = "현재 사용자의 특정 이벤트 구독을 취소합니다")
@@ -160,9 +151,10 @@ public class EventController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping("/{eventId}/check")
     public ResponseEntity<CommonResponse> checkEvent(
-            @Parameter(description = "완료할 이벤트의 ID") @PathVariable String eventId,
+            @Parameter(description = "완료할 이벤트의 ID") @PathVariable Long eventId,
             @LoginedUser AuthenticatedUserDto userInfo
     ){
+        eventService.finishEvent(eventId, userInfo.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse(201, null));
     }
 }
