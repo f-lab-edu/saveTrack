@@ -51,4 +51,11 @@ public class Subscription extends BaseEntity {
         return log;
     }
 
+    public void setSubscribedAt(ZonedDateTime subscribedAt) {
+        this.subscribedAt = subscribedAt;
+    }
+
+    public void setCanceledAt(ZonedDateTime canceledAt) {
+        this.canceledAt = canceledAt;
+    }
 }

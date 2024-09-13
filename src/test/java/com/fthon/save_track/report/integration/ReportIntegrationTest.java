@@ -24,7 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
@@ -199,5 +199,67 @@ public class ReportIntegrationTest {
         );
 
     }
+
+    @Test
+    @DisplayName("이미 구독취소를 한 이벤트일 경우 구독 취소를 한 날까지의 데이터만 보여진다.")
+    void testCancelSubscriptionDateRange() throws Exception{
+        // given
+        User user = new User();
+        Category category = new Category();
+
+        Event event = new Event(category, List.of(), false,  "이벤트", "내용", "메시지1", "메시지2", "메시지3");
+        Subscription s = user.addSubscription(event);
+        s.setSubscribedAt(ZonedDateTime.of(
+                LocalDateTime.of(2024, 1, 1, 0,0,0),
+                ZoneOffset.UTC
+        ));
+
+        s.setCanceledAt(
+                ZonedDateTime.of(
+                        LocalDateTime.of(2024, 1, 2, 0,0,0),
+                        ZoneOffset.UTC
+                )
+        );
+
+        categoryRepository.save(category);
+        eventRepository.save(event);
+        userRepository.save(user);
+
+        // when
+        String uri = "/api/reports";
+        String jwt = jwtUtils.sign(AuthenticatedUserDto.of(user), new Date());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+
+        MvcResult mvcResult = mockMvc.perform(get(uri)
+                .param("startDate", LocalDate.of(2023, 12, 31).format(formatter))
+                .param("endDate", LocalDate.of(2024,1,3).format(formatter))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+        ).andDo(
+                print()
+        ).andReturn();
+
+        // then
+        ReportController.ReportListResponse actual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ReportController.ReportListResponse.class);
+
+        List<LocalDate> expectedEmptys = List.of(
+                LocalDate.of(2023, 12, 31),
+                LocalDate.of(2024, 1, 3)
+        );
+        List<LocalDate> expectedNotEmptys = List.of(
+                LocalDate.of(2024, 1, 1),
+                LocalDate.of(2024, 1, 2)
+        );
+
+
+        for(LocalDate expectedEmpty : expectedEmptys){
+            assertThat(actual.getData().get(expectedEmpty)).isEmpty();
+        }
+        for(LocalDate expectedNotEmpty : expectedNotEmptys){
+            assertThat(actual.getData().get(expectedNotEmpty)).isNotEmpty();
+        }
+
+    }
+
 
 }
