@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class UserEventLogDto {
 
     private final Long eventId;

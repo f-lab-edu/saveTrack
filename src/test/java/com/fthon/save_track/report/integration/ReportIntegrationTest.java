@@ -11,6 +11,7 @@ import com.fthon.save_track.report.dto.ReportDateResponse;
 import com.fthon.save_track.user.persistence.User;
 import com.fthon.save_track.user.persistence.UserEventLog;
 import com.fthon.save_track.user.repository.UserRepository;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -158,6 +159,45 @@ public class ReportIntegrationTest {
 
     }
 
+    @Test
+    @DisplayName("사용자가 체크를 하지 않아도 구독을 했다면 리포트에 조회할 수 있다.")
+    void testUnCheckedSubscription() throws Exception{
+        // given
+        User user = new User();
+        Category category = new Category();
 
+        Event event = new Event(category, List.of(), false,  "이벤트", "내용", "메시지1", "메시지2", "메시지3");
+        user.addSubscription(event);
+
+        categoryRepository.save(category);
+        eventRepository.save(event);
+        userRepository.save(user);
+
+        // when
+        String uri = "/api/reports";
+        String jwt = jwtUtils.sign(AuthenticatedUserDto.of(user), new Date());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.now();
+
+        MvcResult mvcResult = mockMvc.perform(get(uri)
+                .param("startDate", date.format(formatter))
+                .param("endDate", date.format(formatter))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+        ).andDo(
+                print()
+        ).andReturn();
+
+        // then
+        ReportController.ReportListResponse actual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ReportController.ReportListResponse.class);
+        assertThat(actual.getCode()).isEqualTo(200);
+        assertThat(actual.getData().get(date)).extracting("eventId", "eventName", "checked").containsExactly(
+                Tuple.tuple(
+                        event.getId(),
+                        event.getEventName(),
+                        false
+                )
+        );
+
+    }
 
 }
