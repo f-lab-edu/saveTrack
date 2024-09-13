@@ -4,10 +4,7 @@ import com.fthon.save_track.common.domain.BaseEntity;
 import com.fthon.save_track.event.persistence.Subscription;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -19,6 +16,11 @@ public class UserEventLog extends BaseEntity {
     @ManyToOne
     private Subscription subscription;
 
-    private boolean isChecked;
+    @Builder.Default
+    private boolean isChecked = false;
+
+    public void finish() {
+        this.isChecked = true;  // 삭제 상태로 변경
+    }
 
 }
