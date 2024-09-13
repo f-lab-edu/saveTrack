@@ -5,14 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fthon.save_track.auth.dto.AuthenticatedUserDto;
 import com.fthon.save_track.auth.utils.JwtUtils;
 import com.fthon.save_track.common.dto.ErrorResponse;
-import com.fthon.save_track.event.persistence.Category;
-import com.fthon.save_track.event.persistence.CategoryRepository;
-import com.fthon.save_track.event.persistence.Event;
-import com.fthon.save_track.event.persistence.EventRepository;
+import com.fthon.save_track.event.persistence.*;
 import com.fthon.save_track.report.controller.ReportController;
 import com.fthon.save_track.report.dto.ReportDateResponse;
 import com.fthon.save_track.user.persistence.User;
+import com.fthon.save_track.user.persistence.UserEventLog;
 import com.fthon.save_track.user.repository.UserRepository;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
@@ -66,12 +65,14 @@ public class ReportIntegrationTest {
         User user = new User();
         Category category = new Category();
 
-        Event event1 = new Event(category, List.of(), "이벤트", "내용", "메시지1", "메시지2", "메시지3");
-        Event event2 = new Event(category, List.of(), "이벤트2", "내용", "메시지1", "메시지2", "메시지3");
+        Event event1 = new Event(category, List.of(), false,  "이벤트", "내용", "메시지1", "메시지2", "메시지3");
+        Event event2 = new Event(category, List.of(), false, "이벤트2", "내용", "메시지1", "메시지2", "메시지3");
 
-        user.addLog(event1, true);
-        user.addLog(event2, false);
+        Subscription s1 = user.addSubscription(event1);
+        Subscription s2 = user.addSubscription(event2);
 
+        UserEventLog l1 = s1.addLog(true);
+        UserEventLog l2 = s2.addLog(false);
 
         categoryRepository.save(category);
         eventRepository.saveAll(List.of(event1, event2));
@@ -96,9 +97,10 @@ public class ReportIntegrationTest {
         //then
         ReportController.ReportListResponse actual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ReportController.ReportListResponse.class);
 
-        List<ReportDateResponse> expectedEndDateData = user.getLogs().stream().map(log->{
-            return new ReportDateResponse(log.getEvent().getId(), log.getEvent().getEventName(), log.isChecked(), log.getCreatedAt());
-        }).toList();
+        List<ReportDateResponse> expectedEndDateData = List.of(
+                new ReportDateResponse(event1.getId(), event1.getEventName(), l1.isChecked(), l1.getCreatedAt()),
+                new ReportDateResponse(event2.getId(), event2.getEventName(), l2.isChecked(), l2.getCreatedAt())
+        );
 
 
         assertThat(actual.getCode()).isEqualTo(200);
@@ -157,6 +159,107 @@ public class ReportIntegrationTest {
 
     }
 
+    @Test
+    @DisplayName("사용자가 체크를 하지 않아도 구독을 했다면 리포트에 조회할 수 있다.")
+    void testUnCheckedSubscription() throws Exception{
+        // given
+        User user = new User();
+        Category category = new Category();
+
+        Event event = new Event(category, List.of(), false,  "이벤트", "내용", "메시지1", "메시지2", "메시지3");
+        user.addSubscription(event);
+
+        categoryRepository.save(category);
+        eventRepository.save(event);
+        userRepository.save(user);
+
+        // when
+        String uri = "/api/reports";
+        String jwt = jwtUtils.sign(AuthenticatedUserDto.of(user), new Date());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.now();
+
+        MvcResult mvcResult = mockMvc.perform(get(uri)
+                .param("startDate", date.format(formatter))
+                .param("endDate", date.format(formatter))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+        ).andDo(
+                print()
+        ).andReturn();
+
+        // then
+        ReportController.ReportListResponse actual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ReportController.ReportListResponse.class);
+        assertThat(actual.getCode()).isEqualTo(200);
+        assertThat(actual.getData().get(date)).extracting("eventId", "eventName", "checked").containsExactly(
+                Tuple.tuple(
+                        event.getId(),
+                        event.getEventName(),
+                        false
+                )
+        );
+
+    }
+
+    @Test
+    @DisplayName("이미 구독취소를 한 이벤트일 경우 구독 취소를 한 날까지의 데이터만 보여진다.")
+    void testCancelSubscriptionDateRange() throws Exception{
+        // given
+        User user = new User();
+        Category category = new Category();
+
+        Event event = new Event(category, List.of(), false,  "이벤트", "내용", "메시지1", "메시지2", "메시지3");
+        Subscription s = user.addSubscription(event);
+        s.setSubscribedAt(ZonedDateTime.of(
+                LocalDateTime.of(2024, 1, 1, 0,0,0),
+                ZoneOffset.UTC
+        ));
+
+        s.setCanceledAt(
+                ZonedDateTime.of(
+                        LocalDateTime.of(2024, 1, 2, 0,0,0),
+                        ZoneOffset.UTC
+                )
+        );
+
+        categoryRepository.save(category);
+        eventRepository.save(event);
+        userRepository.save(user);
+
+        // when
+        String uri = "/api/reports";
+        String jwt = jwtUtils.sign(AuthenticatedUserDto.of(user), new Date());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+
+        MvcResult mvcResult = mockMvc.perform(get(uri)
+                .param("startDate", LocalDate.of(2023, 12, 31).format(formatter))
+                .param("endDate", LocalDate.of(2024,1,3).format(formatter))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+        ).andDo(
+                print()
+        ).andReturn();
+
+        // then
+        ReportController.ReportListResponse actual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ReportController.ReportListResponse.class);
+
+        List<LocalDate> expectedEmptys = List.of(
+                LocalDate.of(2023, 12, 31),
+                LocalDate.of(2024, 1, 3)
+        );
+        List<LocalDate> expectedNotEmptys = List.of(
+                LocalDate.of(2024, 1, 1),
+                LocalDate.of(2024, 1, 2)
+        );
+
+
+        for(LocalDate expectedEmpty : expectedEmptys){
+            assertThat(actual.getData().get(expectedEmpty)).isEmpty();
+        }
+        for(LocalDate expectedNotEmpty : expectedNotEmptys){
+            assertThat(actual.getData().get(expectedNotEmpty)).isNotEmpty();
+        }
+
+    }
 
 
 }

@@ -1,7 +1,7 @@
 package com.fthon.save_track.user.persistence;
 
 import com.fthon.save_track.common.domain.BaseEntity;
-import com.fthon.save_track.event.persistence.Event;
+import com.fthon.save_track.event.persistence.Subscription;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
@@ -16,12 +16,8 @@ import lombok.NoArgsConstructor;
 @Getter
 public class UserEventLog extends BaseEntity {
 
-
     @ManyToOne
-    private User user;
-
-    @ManyToOne
-    private Event event;
+    private Subscription subscription;
 
     private boolean isChecked;
 

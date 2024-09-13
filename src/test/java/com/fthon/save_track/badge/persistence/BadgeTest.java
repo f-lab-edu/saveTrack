@@ -2,6 +2,7 @@ package com.fthon.save_track.badge.persistence;
 
 import com.fthon.save_track.event.persistence.Category;
 import com.fthon.save_track.event.persistence.Event;
+import com.fthon.save_track.event.persistence.Subscription;
 import com.fthon.save_track.user.persistence.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -49,8 +50,9 @@ class BadgeTest {
         User user = new User("nickname", 1234L, "email@email.com");
         Event event = new Event();
 
+        Subscription subscription = user.addSubscription(event);
         for(int i = 0; i < logCount; i++){
-            user.addLog(event, true);
+            subscription.addLog(true);
         }
 
         //when
@@ -70,7 +72,8 @@ class BadgeTest {
         User user = new User("nickname", 1234L, "email@email.com");
         Event event = new Event();
 
-        user.addLog(event, false);
+        Subscription subscription = user.addSubscription(event);
+        subscription.addLog(false);
 
         //when
         boolean actual = badge.getStrategy().check(user);
@@ -91,13 +94,15 @@ class BadgeTest {
 
         Badge badge = new Badge("뱃지 1", strategy);
         User user = new User("nickname", 1234L, "email@email.com");
-        Event event = new Event(category, List.of(), "이벤트", "내용", "메시지1","메시지2","메시지3");
+        Event event = new Event(category, List.of(), false, "이벤트", "내용", "메시지1","메시지2","메시지3");
         Event event2 = new Event();
 
+        Subscription s1 = user.addSubscription(event);
+        Subscription s2 = user.addSubscription(event2);
         for(int i = 0; i < logCount; i++){
-            user.addLog(event, true);
+            s1.addLog(true);
         }
-        user.addLog(event2, true);
+        s2.addLog(true);
         //when
 
         boolean actual = badge.getStrategy().check(user);
@@ -118,13 +123,13 @@ class BadgeTest {
 
         Badge badge = new Badge("뱃지 1", strategy);
         User user = new User("nickname", 1234L, "email@email.com");
-        Event event = new Event(category, List.of(), "이벤트", "내용", "메시지1","메시지2","메시지3");
+        Event event = new Event(category, List.of(), false, "이벤트", "내용", "메시지1","메시지2","메시지3");
 
-        user.addLog(event, false);
+        Subscription subscription = user.addSubscription(event);
+        subscription.addLog(false);
 
         //when
         boolean actual = badge.getStrategy().check(user);
-
 
         //then
         assertThat(actual).isFalse();
