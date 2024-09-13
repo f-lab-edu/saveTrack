@@ -114,6 +114,10 @@ class UserServiceTest {
                 dateTime.plusDays(2)
         );
 
+
+        Field subscribedAt = Subscription.class.getDeclaredField("subscribedAt");
+        subscribedAt.setAccessible(true);
+        subscribedAt.set(subscription, dateTime);
         for(int i = 0; i < 3; i++){
             UserEventLog log = subscription.getLogs().get(i);
             Field createdAtField = BaseEntity.class.getDeclaredField("createdAt");
