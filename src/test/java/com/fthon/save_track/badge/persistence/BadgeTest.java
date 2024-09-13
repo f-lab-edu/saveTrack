@@ -88,13 +88,13 @@ class BadgeTest {
     @DisplayName("사용자의 특정 카테고리에 속한 이벤트의 갯수를 집계하여 뱃지를 얻을 수 있는지 체크할 수 있다.")
     public void testCheckIndividualCategory(int logCount, boolean expected) throws Exception{
         //given
-        Category category = new Category("카테고리");
+        Category category = new Category("카테고리", "cate");
 
         BadgeChallengeStrategy strategy = new IndividualCategoryCountStrategy(1, category);
 
         Badge badge = new Badge("뱃지 1", strategy);
         User user = new User("nickname", 1234L, "email@email.com", "asdadfsa");
-        Event event = new Event(category, List.of(), false, "이벤트", "내용", "메시지1","메시지2","메시지3");
+        Event event = new Event(category, List.of(), false, "이벤트", "내용", "메시지1","메시지2","메시지3", List.of());
         Event event2 = new Event();
 
         Subscription s1 = user.addSubscription(event);
@@ -117,13 +117,13 @@ class BadgeTest {
     @DisplayName("사용자의 특정 카테고리의 EventLog의 갯수를 집계하여 뱃지를 얻을수 있는지 체크할 때, false로 체크한 것은 갯수에 포함하지 않는다.")
     public void testCheckIndividualCategorySumBool(){
         // given
-        Category category = new Category("카테고리");
+        Category category = new Category("카테고리", "cate");
 
         BadgeChallengeStrategy strategy = new IndividualCategoryCountStrategy(1, category);
 
         Badge badge = new Badge("뱃지 1", strategy);
         User user = new User("nickname", 1234L, "email@email.com", "asdadfsa");
-        Event event = new Event(category, List.of(), false, "이벤트", "내용", "메시지1","메시지2","메시지3");
+        Event event = new Event(category, List.of(), false, "이벤트", "내용", "메시지1","메시지2","메시지3", List.of());
 
         Subscription subscription = user.addSubscription(event);
         subscription.addLog(false);
