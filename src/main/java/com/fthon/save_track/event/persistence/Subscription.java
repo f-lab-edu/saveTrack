@@ -36,8 +36,6 @@ public class Subscription extends BaseEntity {
     @Builder.Default
     private List<UserEventLog> logs = new ArrayList<>();
 
-    private boolean eventCheck; // 지워야 할거같아요
-
     @Builder.Default
     private ZonedDateTime subscribedAt = ZonedDateTime.now();
 
