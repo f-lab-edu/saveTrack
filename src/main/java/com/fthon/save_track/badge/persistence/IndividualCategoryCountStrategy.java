@@ -22,8 +22,9 @@ public class IndividualCategoryCountStrategy extends BadgeChallengeStrategy{
 
     @Override
     public boolean check(User user) {
-        return user.getLogs().stream()
-                .filter((log)->category.equals(log.getEvent().getCategory()))
+        return user.getSubscriptions().stream()
+                .filter((s)->category.equals(s.getEventEntity().getCategory()))
+                .flatMap(s -> s.getLogs().stream())
                 .filter(UserEventLog::isChecked)
                 .count() >= targetCount;
     }

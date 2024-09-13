@@ -7,7 +7,9 @@ import com.fthon.save_track.auth.dto.OAuth2LoginRequest;
 import com.fthon.save_track.auth.service.client.KakaoOAuth2Client;
 import com.fthon.save_track.auth.utils.JwtUtils;
 import com.fthon.save_track.common.exceptions.UnAuthorizedException;
+import com.fthon.save_track.event.persistence.Subscription;
 import com.fthon.save_track.user.dto.UserEventLogDto;
+import com.fthon.save_track.user.dto.UserSubscriptionInfoDto;
 import com.fthon.save_track.user.persistence.User;
 import com.fthon.save_track.user.persistence.UserEventLog;
 import com.fthon.save_track.user.repository.UserRepository;
@@ -15,13 +17,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.chrono.ChronoZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
@@ -44,7 +46,7 @@ public class UserService {
 
         Optional<User> savedUser = userRepository.findByKakaoId(result.getId());
 
-        User user = savedUser.orElseGet(()->saveProcess(result));
+        User user = savedUser.orElseGet(()->saveProcess(result, loginRequest.getDeviceToken()));
 
         return jwtUtils.sign(
                 new AuthenticatedUserDto(
@@ -59,17 +61,30 @@ public class UserService {
     public List<UserEventLogDto> getEventLogDateIn(Long userId, LocalDate startDate, LocalDate endDate){
         User user = userRepository.findById(userId).orElseThrow(() -> new UnAuthorizedException("사용자 정보를 조회할 수 없습니다."));
 
-        return user.getLogs().stream().filter(log->
+        return user.getSubscriptions().stream().flatMap(s->getUserEventLogStream(s, endDate)).filter(log->
                 {
-                    ZonedDateTime startDateTime = ZonedDateTime.of(startDate, LocalTime.MIN, log.getCreatedAt().getZone());
-                    ZonedDateTime endDateTime = ZonedDateTime.of(endDate, LocalTime.MAX, log.getCreatedAt().getZone());
+                    ZoneId zoneId = log.getCheckTime() == null ? ZoneId.systemDefault() : log.getCheckTime().getZone();
+
+                    ZonedDateTime startDateTime = ZonedDateTime.of(startDate, LocalTime.MIN, zoneId);
+                    ZonedDateTime endDateTime = ZonedDateTime.of(endDate, LocalTime.MAX, zoneId);
                     return
-                            isEqualOrAfter(log.getCreatedAt(), startDateTime) &&
-                            isEqualOrBefore(log.getCreatedAt(), endDateTime);
+                            isEqualOrBefore(startDateTime, log.getCheckTime()) &&
+                            isEqualOrAfter(endDateTime, log.getCheckTime());
                 }
-        ).map(UserEventLogDto::of).toList();
+        ).toList();
     }
 
+
+    /**
+     * 모든 사용자의 currentTime 시점에 구독하고 있는 이벤트 정보를 반환
+     * @author minseok kim
+     * @param
+     * @throws
+    */
+    public List<UserSubscriptionInfoDto> getCurrentSubscribes(ZonedDateTime currentTime) {
+        return StreamSupport.stream(userRepository.findAll().spliterator(), true)
+                .map(u->convertUserToDto(u, currentTime)).toList();
+    }
 
     @Transactional(readOnly = true)
     public String loginByEmail(String email){
@@ -83,11 +98,12 @@ public class UserService {
     }
 
 
-    private User saveProcess(KakaoUserInfo kakaoUserInfo){
+    private User saveProcess(KakaoUserInfo kakaoUserInfo, String deviceToken){
         User user = new User(
                 kakaoUserInfo.getKakaoAccount().getProfile().getNickname(),
                 kakaoUserInfo.getId(),
-                kakaoUserInfo.getKakaoAccount().getEmail()
+                kakaoUserInfo.getKakaoAccount().getEmail(),
+                deviceToken
         );
 
         userRepository.save(user);
@@ -95,10 +111,51 @@ public class UserService {
     }
 
     private boolean isEqualOrAfter(ZonedDateTime date1, ZonedDateTime date2) {
+        if(date2 == null){
+            return false;
+        }
         return date1.isEqual(date2) || date1.isAfter(date2);
     }
     private boolean isEqualOrBefore(ZonedDateTime date1, ZonedDateTime date2) {
+        if(date2 == null){
+            return false;
+        }
         return date1.isEqual(date2) || date1.isBefore(date2);
     }
 
+
+    private Stream<UserEventLogDto> getUserEventLogStream(Subscription subscription, LocalDate endDate){
+        // 구독 시작일과 종료일
+        ZonedDateTime subscribedAt = subscription.getSubscribedAt();
+        ZonedDateTime canceledAt = subscription.getCanceledAt();
+
+        // endDate와 canceledAt 중 더 이른 날짜를 계산
+        LocalDate actualEndDate = canceledAt.toLocalDate().isBefore(endDate) ? canceledAt.toLocalDate() : endDate;
+
+        // 구독 시작일부터 실제 종료일까지 날짜 생성
+        return subscribedAt.toLocalDate().datesUntil(actualEndDate.plusDays(1))
+                .map(date -> {
+                    // 해당 날짜의 로그를 찾는다
+                    return subscription.getLogs().stream()
+                            .filter(log -> log.getCreatedAt().toLocalDate().equals(date))
+                            .findFirst()
+                            .map(UserEventLogDto::of) // 로그가 있으면 해당 로그를 Dto로 변환
+                            .orElseGet(() -> new UserEventLogDto(
+                                    subscription.getEventEntity().getId(),
+                                    subscription.getEventEntity().getEventName(),
+                                    false,
+                                    ZonedDateTime.of(date, LocalTime.MIN, ZoneId.systemDefault())
+                            )); // 로그가 없으면 기본 Dto 생성
+                });
+    }
+
+    private UserSubscriptionInfoDto convertUserToDto(User user, ZonedDateTime dateTime){
+        List<UserSubscriptionInfoDto.SubscribeEventInfoDto> subscribeEvents = user.getSubscriptions().stream().filter(s -> isEqualOrBefore(dateTime, s.getCanceledAt()))
+                .map(UserSubscriptionInfoDto.SubscribeEventInfoDto::of).toList();
+
+        return UserSubscriptionInfoDto.builder()
+                .userDeviceToken(user.getDeviceToken())
+                .subscribeEvents(subscribeEvents)
+                .build();
+    }
 }

@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 @Getter
 public class CategorySearchResponse {
 
-    private Long categoryId;
+    private String categoryId;
     private String categoryName;
 
 
     public static CategorySearchResponse of(Category category){
         return new CategorySearchResponse(
-                category.getId(),
+                category.getUid(),
                 category.getName()
         );
     }

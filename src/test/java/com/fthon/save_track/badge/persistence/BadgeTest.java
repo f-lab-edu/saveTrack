@@ -2,6 +2,7 @@ package com.fthon.save_track.badge.persistence;
 
 import com.fthon.save_track.event.persistence.Category;
 import com.fthon.save_track.event.persistence.Event;
+import com.fthon.save_track.event.persistence.Subscription;
 import com.fthon.save_track.user.persistence.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -46,11 +47,12 @@ class BadgeTest {
         //given
         BadgeChallengeStrategy strategy = new TotalCategoryCountStrategy(1);
         Badge badge = new Badge("뱃지 1", strategy);
-        User user = new User("nickname", 1234L, "email@email.com");
+        User user = new User("nickname", 1234L, "email@email.com", "asdadfsa");
         Event event = new Event();
 
+        Subscription subscription = user.addSubscription(event);
         for(int i = 0; i < logCount; i++){
-            user.addLog(event, true);
+            subscription.addLog(true);
         }
 
         //when
@@ -67,10 +69,11 @@ class BadgeTest {
         //given
         BadgeChallengeStrategy strategy = new TotalCategoryCountStrategy(1);
         Badge badge = new Badge("뱃지 1", strategy);
-        User user = new User("nickname", 1234L, "email@email.com");
+        User user = new User("nickname", 1234L, "email@email.com", "asdadfsa");
         Event event = new Event();
 
-        user.addLog(event, false);
+        Subscription subscription = user.addSubscription(event);
+        subscription.addLog(false);
 
         //when
         boolean actual = badge.getStrategy().check(user);
@@ -85,19 +88,21 @@ class BadgeTest {
     @DisplayName("사용자의 특정 카테고리에 속한 이벤트의 갯수를 집계하여 뱃지를 얻을 수 있는지 체크할 수 있다.")
     public void testCheckIndividualCategory(int logCount, boolean expected) throws Exception{
         //given
-        Category category = new Category("카테고리");
+        Category category = new Category("카테고리", "cate");
 
         BadgeChallengeStrategy strategy = new IndividualCategoryCountStrategy(1, category);
 
         Badge badge = new Badge("뱃지 1", strategy);
-        User user = new User("nickname", 1234L, "email@email.com");
-        Event event = new Event(category, List.of(), "이벤트", "내용", "메시지1","메시지2","메시지3");
+        User user = new User("nickname", 1234L, "email@email.com", "asdadfsa");
+        Event event = new Event(category, List.of(), false, "이벤트", "내용", "메시지1","메시지2","메시지3", List.of());
         Event event2 = new Event();
 
+        Subscription s1 = user.addSubscription(event);
+        Subscription s2 = user.addSubscription(event2);
         for(int i = 0; i < logCount; i++){
-            user.addLog(event, true);
+            s1.addLog(true);
         }
-        user.addLog(event2, true);
+        s2.addLog(true);
         //when
 
         boolean actual = badge.getStrategy().check(user);
@@ -112,19 +117,19 @@ class BadgeTest {
     @DisplayName("사용자의 특정 카테고리의 EventLog의 갯수를 집계하여 뱃지를 얻을수 있는지 체크할 때, false로 체크한 것은 갯수에 포함하지 않는다.")
     public void testCheckIndividualCategorySumBool(){
         // given
-        Category category = new Category("카테고리");
+        Category category = new Category("카테고리", "cate");
 
         BadgeChallengeStrategy strategy = new IndividualCategoryCountStrategy(1, category);
 
         Badge badge = new Badge("뱃지 1", strategy);
-        User user = new User("nickname", 1234L, "email@email.com");
-        Event event = new Event(category, List.of(), "이벤트", "내용", "메시지1","메시지2","메시지3");
+        User user = new User("nickname", 1234L, "email@email.com", "asdadfsa");
+        Event event = new Event(category, List.of(), false, "이벤트", "내용", "메시지1","메시지2","메시지3", List.of());
 
-        user.addLog(event, false);
+        Subscription subscription = user.addSubscription(event);
+        subscription.addLog(false);
 
         //when
         boolean actual = badge.getStrategy().check(user);
-
 
         //then
         assertThat(actual).isFalse();

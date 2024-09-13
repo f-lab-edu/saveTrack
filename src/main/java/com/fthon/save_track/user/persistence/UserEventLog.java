@@ -1,28 +1,26 @@
 package com.fthon.save_track.user.persistence;
 
 import com.fthon.save_track.common.domain.BaseEntity;
-import com.fthon.save_track.event.persistence.Event;
+import com.fthon.save_track.event.persistence.Subscription;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Entity
 @Getter
 public class UserEventLog extends BaseEntity {
 
-
     @ManyToOne
-    private User user;
+    private Subscription subscription;
 
-    @ManyToOne
-    private Event event;
+    @Builder.Default
+    private boolean isChecked = false;
 
-    private boolean isChecked;
+    public void finish() {
+        this.isChecked = true;  // 삭제 상태로 변경
+    }
 
 }

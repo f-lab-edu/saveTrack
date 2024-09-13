@@ -13,10 +13,9 @@ import java.util.List;
 @Getter
 public class EventUpdateRequest {
 
-    private String name;
-    private String purpose;
-    private List<DayOfWeek> dayOfWeeks;
     private String categoryId;
+    private String eventName;
+    private String eventContent;
     private String morningCheerMessage;
     private String afternoonCheerMessage;
     private String eveningCheerMessage;

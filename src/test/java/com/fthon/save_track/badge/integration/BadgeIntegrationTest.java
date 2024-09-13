@@ -9,10 +9,7 @@ import com.fthon.save_track.badge.persistence.Badge;
 import com.fthon.save_track.badge.persistence.IndividualCategoryCountStrategy;
 import com.fthon.save_track.badge.persistence.TotalCategoryCountStrategy;
 import com.fthon.save_track.badge.repository.BadgeRepository;
-import com.fthon.save_track.event.persistence.Category;
-import com.fthon.save_track.event.persistence.CategoryRepository;
-import com.fthon.save_track.event.persistence.Event;
-import com.fthon.save_track.event.persistence.EventRepository;
+import com.fthon.save_track.event.persistence.*;
 import com.fthon.save_track.user.persistence.User;
 import com.fthon.save_track.user.persistence.UserBadge;
 import com.fthon.save_track.user.repository.UserRepository;
@@ -78,12 +75,14 @@ class BadgeIntegrationTest {
         Category category1 = new Category();
         Category category2 = new Category();
 
-        Event event1 = new Event(category1, List.of(), "이벤트", "내용", "메시지1", "메시지2", "메시지3");
-        Event event2 = new Event(category2, List.of(), "이벤트2", "내용", "메시지1", "메시지2", "메시지3");
+        Event event1 = new Event(category1, List.of(), false, "이벤트", "내용", "메시지1", "메시지2", "메시지3", List.of());
+        Event event2 = new Event(category2, List.of(), false,"이벤트2", "내용", "메시지1", "메시지2", "메시지3", List.of());
 
-        user.addLog(event1, true);
-        user.addLog(event1, true);
-        user.addLog(event2, true);
+        Subscription s1 = user.addSubscription(event1);
+        Subscription s2 = user.addSubscription(event2);
+        s1.addLog(true);
+        s1.addLog(true);
+        s2.addLog(true);
 
         Badge badge1 = new Badge("카테고리 1 절약왕", new IndividualCategoryCountStrategy(2, category1));
         Badge badge2 = new Badge("카테고리 2 절약왕", new IndividualCategoryCountStrategy(2, category2));
@@ -106,10 +105,10 @@ class BadgeIntegrationTest {
     @DisplayName("뱃지 전체 리스트를 조회할 수 있다.")
     void testSearchBadges() throws Exception{
         // given
-        User user = new User("유저", 123L, "email@email.com");
-        Category category = new Category("카테고리 1");
+        User user = new User("유저", 123L, "email@email.com", "asdsad");
+        Category category = new Category("카테고리 1", "cate-001");
 
-        Event event = new Event(category, List.of(), "이벤트", "내용", "메시지1", "메시지2", "메시지3");
+        Event event = new Event(category, List.of(), false, "이벤트", "내용", "메시지1", "메시지2", "메시지3", List.of());
 
         Badge badge1 = new Badge("카테고리 1 절약왕", new IndividualCategoryCountStrategy(2, category));
         Badge badge2 = new Badge("전체 3개이상 절약왕", new TotalCategoryCountStrategy(3));

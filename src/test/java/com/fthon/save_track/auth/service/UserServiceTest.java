@@ -5,11 +5,15 @@ import com.fthon.save_track.auth.dto.OAuth2LoginRequest;
 import com.fthon.save_track.auth.service.client.KakaoOAuth2Client;
 import com.fthon.save_track.common.domain.BaseEntity;
 import com.fthon.save_track.event.persistence.Event;
+import com.fthon.save_track.event.persistence.EventRepository;
+import com.fthon.save_track.event.persistence.Subscription;
 import com.fthon.save_track.user.dto.UserEventLogDto;
+import com.fthon.save_track.user.dto.UserSubscriptionInfoDto;
 import com.fthon.save_track.user.persistence.User;
 import com.fthon.save_track.user.persistence.UserEventLog;
 import com.fthon.save_track.user.repository.UserRepository;
 import com.fthon.save_track.user.service.UserService;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +44,9 @@ class UserServiceTest {
     @SpyBean
     private UserRepository userRepository;
 
+    @Autowired
+    private EventRepository eventRepository;
+
     @MockBean
     private KakaoOAuth2Client kakaoOAuth2Client;
 
@@ -51,12 +57,13 @@ class UserServiceTest {
         //given
         KakaoUserInfo kakaoUserInfo = createDummyKakaoUserInfo();
         given(kakaoOAuth2Client.getUserInfo(any())).willReturn(kakaoUserInfo);
-
+        String deviceToken = "asdsfs";
 
         //when
         OAuth2LoginRequest reqBody = new OAuth2LoginRequest(
                 "kakao",
-                "token"
+                "token",
+                deviceToken
         );
 
         String result = userService.doOAuth2Login(reqBody);
@@ -73,18 +80,21 @@ class UserServiceTest {
         //given
         KakaoUserInfo kakaoUserInfo = createDummyKakaoUserInfo();
         given(kakaoOAuth2Client.getUserInfo(any())).willReturn(kakaoUserInfo);
-
+        String deviceToken = "asdsfs";
         User user = new User(
                 kakaoUserInfo.getKakaoAccount().getName(),
                 kakaoUserInfo.getId(),
-                kakaoUserInfo.getKakaoAccount().getEmail()
+                kakaoUserInfo.getKakaoAccount().getEmail(),
+                deviceToken
         );
         userRepository.save(user);
 
         //when
+
         OAuth2LoginRequest reqBody = new OAuth2LoginRequest(
                 "kakao",
-                "token"
+                "token",
+                deviceToken
         );
 
         String result = userService.doOAuth2Login(reqBody);
@@ -100,8 +110,10 @@ class UserServiceTest {
         User user = new User();
         Event event = new Event();
 
+        Subscription subscription = user.addSubscription(event);
+
         for(int i = 0; i < 3; i++){
-            user.addLog(event, true);
+            subscription.addLog(true);
         }
 
         ZonedDateTime dateTime = ZonedDateTime.of(2024, 9, 11, 0, 0, 0, 0, ZoneOffset.UTC);
@@ -111,8 +123,12 @@ class UserServiceTest {
                 dateTime.plusDays(2)
         );
 
+
+        Field subscribedAt = Subscription.class.getDeclaredField("subscribedAt");
+        subscribedAt.setAccessible(true);
+        subscribedAt.set(subscription, dateTime);
         for(int i = 0; i < 3; i++){
-            UserEventLog log = user.getLogs().get(i);
+            UserEventLog log = subscription.getLogs().get(i);
             Field createdAtField = BaseEntity.class.getDeclaredField("createdAt");
             createdAtField.setAccessible(true);
             createdAtField.set(log, dateTimes.get(i));
@@ -125,12 +141,79 @@ class UserServiceTest {
 
         //then
         List<UserEventLogDto> expected = List.of(
-                UserEventLogDto.of(user.getLogs().get(1)),
-                UserEventLogDto.of(user.getLogs().get(2))
+                UserEventLogDto.of(subscription.getLogs().get(1)),
+                UserEventLogDto.of(subscription.getLogs().get(2))
         );
 
         assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
     }
+
+    @Test
+    @DisplayName("유저가 현재 구독하고 있는 이벤트의 정보를 반환할 수 있다.")
+    void testGetUserCurrentSubscriptions() throws Exception{
+        // given
+        String deviceToken = "deviceToken";
+        User user = new User(
+                "nickname",
+                1234L,
+                "email@email.com",
+                deviceToken
+        );
+        Event event1 = new Event();
+        Event event2 = new Event(
+                null,
+                List.of(),
+                false,
+                "name",
+                "content",
+                "morning",
+                "afternoon",
+                "evening",
+                List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY)
+        );
+
+        Subscription s1 = user.addSubscription(event1);
+        Subscription s2 = user.addSubscription(event2);
+
+        ZonedDateTime subscribeTime = ZonedDateTime.of(
+                LocalDateTime.of(2024, 9, 13, 0, 0, 0),
+                ZoneId.systemDefault()
+        );
+
+        ZonedDateTime s1CancelTime = ZonedDateTime.of(
+                LocalDateTime.of(2024, 9, 14, 0, 0, 0),
+                ZoneId.systemDefault()
+        );
+
+
+        s1.setSubscribedAt(subscribeTime);
+        s1.setCanceledAt(s1CancelTime);
+        s2.setSubscribedAt(subscribeTime);
+
+        eventRepository.saveAll(List.of(event1, event2));
+        userRepository.save(user);
+        // when
+        List<UserSubscriptionInfoDto> actual = userService.getCurrentSubscribes(s1CancelTime.plusDays(1));
+        // then
+        assertThat(actual.get(0).getUserDeviceToken()).isEqualTo(deviceToken);
+        assertThat(actual.get(0).getSubscribeEvents()).hasSize(1);
+        assertThat(actual.get(0).getSubscribeEvents()).extracting(
+                "eventName",
+                "morningMessage",
+                "afternoonMessage",
+                "eveningMessage"
+        ).containsExactly(
+                Tuple.tuple(
+                        "name",
+                        "morning",
+                        "afternoon",
+                        "evening"
+                )
+        );
+        assertThat(actual.get(0).getSubscribeEvents().get(0).getNotificationDayOfWeeks())
+                .containsExactlyInAnyOrder(DayOfWeek.MONDAY, DayOfWeek.TUESDAY);
+    }
+
 
     private KakaoUserInfo createDummyKakaoUserInfo(){
         return  KakaoUserInfo.builder()
