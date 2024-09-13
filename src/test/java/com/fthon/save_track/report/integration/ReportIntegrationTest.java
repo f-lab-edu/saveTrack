@@ -65,8 +65,8 @@ public class ReportIntegrationTest {
         User user = new User();
         Category category = new Category();
 
-        Event event1 = new Event(category, List.of(), false,  "이벤트", "내용", "메시지1", "메시지2", "메시지3");
-        Event event2 = new Event(category, List.of(), false, "이벤트2", "내용", "메시지1", "메시지2", "메시지3");
+        Event event1 = new Event(category, List.of(), false,  "이벤트", "내용", "메시지1", "메시지2", "메시지3", List.of());
+        Event event2 = new Event(category, List.of(), false, "이벤트2", "내용", "메시지1", "메시지2", "메시지3", List.of());
 
         Subscription s1 = user.addSubscription(event1);
         Subscription s2 = user.addSubscription(event2);
@@ -166,7 +166,7 @@ public class ReportIntegrationTest {
         User user = new User();
         Category category = new Category();
 
-        Event event = new Event(category, List.of(), false,  "이벤트", "내용", "메시지1", "메시지2", "메시지3");
+        Event event = new Event(category, List.of(), false,  "이벤트", "내용", "메시지1", "메시지2", "메시지3", List.of());
         user.addSubscription(event);
 
         categoryRepository.save(category);
@@ -207,7 +207,7 @@ public class ReportIntegrationTest {
         User user = new User();
         Category category = new Category();
 
-        Event event = new Event(category, List.of(), false,  "이벤트", "내용", "메시지1", "메시지2", "메시지3");
+        Event event = new Event(category, List.of(), false,  "이벤트", "내용", "메시지1", "메시지2", "메시지3", List.of());
         Subscription s = user.addSubscription(event);
         s.setSubscribedAt(ZonedDateTime.of(
                 LocalDateTime.of(2024, 1, 1, 0,0,0),

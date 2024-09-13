@@ -201,17 +201,17 @@ class UserServiceTest {
                 "eventName",
                 "morningMessage",
                 "afternoonMessage",
-                "eveningMessage",
-                "notificationDayOfWeeks"
+                "eveningMessage"
         ).containsExactly(
                 Tuple.tuple(
                         "name",
                         "morning",
                         "afternoon",
-                        "evening",
-                        List.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY)
+                        "evening"
                 )
         );
+        assertThat(actual.get(0).getSubscribeEvents().get(0).getNotificationDayOfWeeks())
+                .containsExactlyInAnyOrder(DayOfWeek.MONDAY, DayOfWeek.TUESDAY);
     }
 
 

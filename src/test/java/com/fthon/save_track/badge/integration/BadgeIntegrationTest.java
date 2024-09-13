@@ -75,8 +75,8 @@ class BadgeIntegrationTest {
         Category category1 = new Category();
         Category category2 = new Category();
 
-        Event event1 = new Event(category1, List.of(), false, "이벤트", "내용", "메시지1", "메시지2", "메시지3");
-        Event event2 = new Event(category2, List.of(), false,"이벤트2", "내용", "메시지1", "메시지2", "메시지3");
+        Event event1 = new Event(category1, List.of(), false, "이벤트", "내용", "메시지1", "메시지2", "메시지3", List.of());
+        Event event2 = new Event(category2, List.of(), false,"이벤트2", "내용", "메시지1", "메시지2", "메시지3", List.of());
 
         Subscription s1 = user.addSubscription(event1);
         Subscription s2 = user.addSubscription(event2);
@@ -106,9 +106,9 @@ class BadgeIntegrationTest {
     void testSearchBadges() throws Exception{
         // given
         User user = new User("유저", 123L, "email@email.com", "asdsad");
-        Category category = new Category("카테고리 1");
+        Category category = new Category("카테고리 1", "cate-001");
 
-        Event event = new Event(category, List.of(), false, "이벤트", "내용", "메시지1", "메시지2", "메시지3");
+        Event event = new Event(category, List.of(), false, "이벤트", "내용", "메시지1", "메시지2", "메시지3", List.of());
 
         Badge badge1 = new Badge("카테고리 1 절약왕", new IndividualCategoryCountStrategy(2, category));
         Badge badge2 = new Badge("전체 3개이상 절약왕", new TotalCategoryCountStrategy(3));
