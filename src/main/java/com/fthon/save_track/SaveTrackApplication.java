@@ -49,19 +49,43 @@ public class SaveTrackApplication {
 			categoryRepository.deleteAll();
 
 			User user = new User("테스트 유저", 12312421L, "test@email.com", "asdsadsad");
-			Category category1 = new Category("category-001", "물 절약");
-			Category category2 = new Category("category-001", "돈 절약");
+			Category category1 = new Category("category-001", "전기 절약");
+			Category category2 = new Category("category-002", "돈 절약");
+			Category category3 = new Category("category-003", "시간 절약");
 
 			Event event1 = new Event(category1, List.of(), false, "물 아껴쓰기", "내용", "메시지1", "메시지2", "메시지3", List.of(DayOfWeek.SATURDAY));
 			Event event2 = new Event(category2, List.of(), false, "배달 음식 참기", "내용", "메시지1", "메시지2", "메시지3", List.of(DayOfWeek.SATURDAY));
 
-			Badge badge1 = new Badge("물 절약왕", new IndividualCategoryCountStrategy(2, category1));
-			Badge badge2 = new Badge("돈 절약왕", new IndividualCategoryCountStrategy(2, category2));
-			Badge badge3 = new Badge("전체 절약왕", new TotalCategoryCountStrategy(3));
+			List<Badge> badge1 = List.of(
+					new Badge("electric1", new IndividualCategoryCountStrategy(1, category1)),
+					new Badge("electric5", new IndividualCategoryCountStrategy(5, category1)),
+					new Badge("electric10", new IndividualCategoryCountStrategy(10, category1)),
+					new Badge("electric50", new IndividualCategoryCountStrategy(50, category1)),
+					new Badge("electric100", new IndividualCategoryCountStrategy(100, category1))
+			);
 
-			categoryRepository.saveAll(List.of(category1, category2));
+			List<Badge> badge2 = List.of(
+					new Badge("money1", new IndividualCategoryCountStrategy(1, category2)),
+					new Badge("money5", new IndividualCategoryCountStrategy(5, category2)),
+					new Badge("money10", new IndividualCategoryCountStrategy(10, category2)),
+					new Badge("money50", new IndividualCategoryCountStrategy(50, category2)),
+					new Badge("money100", new IndividualCategoryCountStrategy(100, category2))
+			);
+
+			List<Badge> badge3 = List.of(
+					new Badge("time1", new IndividualCategoryCountStrategy(1, category3)),
+					new Badge("time5", new IndividualCategoryCountStrategy(5, category3)),
+					new Badge("time10", new IndividualCategoryCountStrategy(10, category3)),
+					new Badge("time50", new IndividualCategoryCountStrategy(50, category3)),
+					new Badge("time100", new IndividualCategoryCountStrategy(100, category3))
+			);
+
+			categoryRepository.saveAll(List.of(category1, category2, category3));
 			eventRepository.saveAll(List.of(event1, event2));
-			badgeRepository.saveAll(List.of(badge1, badge2, badge3));
+
+			badgeRepository.saveAll(badge1);
+			badgeRepository.saveAll(badge2);
+			badgeRepository.saveAll(badge3);
 			userRepository.save(user);
 		}
 	}
