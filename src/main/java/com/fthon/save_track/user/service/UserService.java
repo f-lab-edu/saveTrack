@@ -9,6 +9,7 @@ import com.fthon.save_track.auth.utils.JwtUtils;
 import com.fthon.save_track.common.exceptions.UnAuthorizedException;
 import com.fthon.save_track.event.persistence.Subscription;
 import com.fthon.save_track.user.dto.UserEventLogDto;
+import com.fthon.save_track.user.dto.UserSubscriptionInfoDto;
 import com.fthon.save_track.user.persistence.User;
 import com.fthon.save_track.user.persistence.UserEventLog;
 import com.fthon.save_track.user.repository.UserRepository;
@@ -22,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @Service
 @Transactional
@@ -72,6 +74,17 @@ public class UserService {
         ).toList();
     }
 
+
+    /**
+     * 모든 사용자의 currentTime 시점에 구독하고 있는 이벤트 정보를 반환
+     * @author minseok kim
+     * @param
+     * @throws
+    */
+    public List<UserSubscriptionInfoDto> getCurrentSubscribes(ZonedDateTime currentTime) {
+        return StreamSupport.stream(userRepository.findAll().spliterator(), true)
+                .map(u->convertUserToDto(u, currentTime)).toList();
+    }
 
     @Transactional(readOnly = true)
     public String loginByEmail(String email){
@@ -134,5 +147,15 @@ public class UserService {
                                     ZonedDateTime.of(date, LocalTime.MIN, ZoneId.systemDefault())
                             )); // 로그가 없으면 기본 Dto 생성
                 });
+    }
+
+    private UserSubscriptionInfoDto convertUserToDto(User user, ZonedDateTime dateTime){
+        List<UserSubscriptionInfoDto.SubscribeEventInfoDto> subscribeEvents = user.getSubscriptions().stream().filter(s -> isEqualOrBefore(dateTime, s.getCanceledAt()))
+                .map(UserSubscriptionInfoDto.SubscribeEventInfoDto::of).toList();
+
+        return UserSubscriptionInfoDto.builder()
+                .userDeviceToken(user.getDeviceToken())
+                .subscribeEvents(subscribeEvents)
+                .build();
     }
 }

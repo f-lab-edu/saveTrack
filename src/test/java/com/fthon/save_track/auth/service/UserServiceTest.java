@@ -5,12 +5,15 @@ import com.fthon.save_track.auth.dto.OAuth2LoginRequest;
 import com.fthon.save_track.auth.service.client.KakaoOAuth2Client;
 import com.fthon.save_track.common.domain.BaseEntity;
 import com.fthon.save_track.event.persistence.Event;
+import com.fthon.save_track.event.persistence.EventRepository;
 import com.fthon.save_track.event.persistence.Subscription;
 import com.fthon.save_track.user.dto.UserEventLogDto;
+import com.fthon.save_track.user.dto.UserSubscriptionInfoDto;
 import com.fthon.save_track.user.persistence.User;
 import com.fthon.save_track.user.persistence.UserEventLog;
 import com.fthon.save_track.user.repository.UserRepository;
 import com.fthon.save_track.user.service.UserService;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +43,9 @@ class UserServiceTest {
 
     @SpyBean
     private UserRepository userRepository;
+
+    @Autowired
+    private EventRepository eventRepository;
 
     @MockBean
     private KakaoOAuth2Client kakaoOAuth2Client;
@@ -142,6 +147,65 @@ class UserServiceTest {
 
         assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
     }
+
+    @Test
+    @DisplayName("유저가 현재 구독하고 있는 이벤트의 정보를 반환할 수 있다.")
+    void testGetUserCurrentSubscriptions() throws Exception{
+        // given
+        String deviceToken = "deviceToken";
+        User user = new User(
+                "nickname",
+                1234L,
+                "email@email.com",
+                deviceToken
+        );
+        Event event1 = new Event();
+        Event event2 = new Event(
+                null,
+                List.of(),
+                false,
+                "name",
+                "content",
+                "morning",
+                "afternoon",
+                "evening"
+        );
+
+        Subscription s1 = user.addSubscription(event1);
+        Subscription s2 = user.addSubscription(event2);
+
+        ZonedDateTime subscribeTime = ZonedDateTime.of(
+                LocalDateTime.of(2024, 9, 13, 0, 0, 0),
+                ZoneId.systemDefault()
+        );
+
+        ZonedDateTime s1CancelTime = ZonedDateTime.of(
+                LocalDateTime.of(2024, 9, 14, 0, 0, 0),
+                ZoneId.systemDefault()
+        );
+
+
+        s1.setSubscribedAt(subscribeTime);
+        s1.setCanceledAt(s1CancelTime);
+        s2.setSubscribedAt(subscribeTime);
+
+        eventRepository.saveAll(List.of(event1, event2));
+        userRepository.save(user);
+        // when
+        List<UserSubscriptionInfoDto> actual = userService.getCurrentSubscribes(s1CancelTime.plusDays(1));
+        // then
+        assertThat(actual.get(0).getUserDeviceToken()).isEqualTo(deviceToken);
+        assertThat(actual.get(0).getSubscribeEvents()).hasSize(1);
+        assertThat(actual.get(0).getSubscribeEvents()).extracting(
+                "eventName",
+                "morningMessage",
+                "afternoonMessage",
+                "eveningMessage"
+        ).containsExactly(
+                Tuple.tuple("name", "morning", "afternoon", "evening")
+        );
+    }
+
 
     private KakaoUserInfo createDummyKakaoUserInfo(){
         return  KakaoUserInfo.builder()

@@ -14,11 +14,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @SpringBootApplication
+@EnableScheduling
 public class SaveTrackApplication {
 
 	public static void main(String[] args) {
@@ -28,6 +31,7 @@ public class SaveTrackApplication {
 
 	@Component
 	@RequiredArgsConstructor
+	@Profile("!test")
 	protected class InitCommandLineRunner implements CommandLineRunner{
 
 		private final UserRepository userRepository;
