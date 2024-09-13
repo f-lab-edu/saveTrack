@@ -54,7 +54,7 @@ public class ReportController {
         }
 
 
-        Map<LocalDate, List<ReportDateResponse>> result = reportService.getReportDateIn(userInfo.getId(), startDate, endDate);
+        List<ReportDateResponse> result = reportService.getReportDateIn(userInfo.getId(), startDate, endDate);
 
         return ResponseEntity.ok(new ReportListResponse(200, result));
     }
@@ -62,12 +62,13 @@ public class ReportController {
 
     @NoArgsConstructor
     @Getter
-    public static class ReportListResponse extends CommonResponse<Map<LocalDate, List<ReportDateResponse>>> {
-        public ReportListResponse(int code, String message, Map<LocalDate, List<ReportDateResponse>> data) {
+    public static class ReportListResponse extends CommonResponse<List<ReportDateResponse>> {
+
+        public ReportListResponse(int code, String message, List<ReportDateResponse> data) {
             super(code, message, data);
         }
 
-        public ReportListResponse(int code, Map<LocalDate, List<ReportDateResponse>> data) {
+        public ReportListResponse(int code, List<ReportDateResponse> data) {
             super(code, data);
         }
     }

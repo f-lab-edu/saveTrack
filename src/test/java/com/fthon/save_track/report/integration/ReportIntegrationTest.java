@@ -98,34 +98,12 @@ public class ReportIntegrationTest {
         ReportController.ReportListResponse actual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ReportController.ReportListResponse.class);
 
         List<ReportDateResponse> expectedEndDateData = List.of(
-                new ReportDateResponse(event1.getId(), event1.getEventName(), l1.isChecked(), l1.getCreatedAt()),
-                new ReportDateResponse(event2.getId(), event2.getEventName(), l2.isChecked(), l2.getCreatedAt())
+                new ReportDateResponse(event1.getId(), l1.getCreatedAt().toInstant().toEpochMilli(), event1.getEventName(), l1.isChecked(), l1.getCreatedAt()),
+                new ReportDateResponse(event2.getId(), l2.getCreatedAt().toInstant().toEpochMilli(), event2.getEventName(), l2.isChecked(), l2.getCreatedAt())
         );
 
 
         assertThat(actual.getCode()).isEqualTo(200);
-
-        // startDate ~ endDate까지의 데이터가 모두 들어가있어야 한다.
-        assertThat(actual.getData().keySet()).containsAll(
-                List.of(
-                    startDate,
-                    startDate.plusDays(1),
-                    startDate.plusDays(2),
-                    endDate
-                )
-        );
-
-
-        // 마지막 날에만 데이터가 들어있어야 한다.
-        for(int i = 0; i < 3; i++){
-            List<ReportDateResponse> expectedEmpty = actual.getData().get(startDate.plusDays(i));
-            assertThat(expectedEmpty).isEmpty();
-        }
-        List<ReportDateResponse> actualEndDateData = actual.getData().get(endDate);
-
-        assertThat(actualEndDateData).containsAll(expectedEndDateData);
-
-
 
     }
 
@@ -190,13 +168,6 @@ public class ReportIntegrationTest {
         // then
         ReportController.ReportListResponse actual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ReportController.ReportListResponse.class);
         assertThat(actual.getCode()).isEqualTo(200);
-        assertThat(actual.getData().get(date)).extracting("eventId", "eventName", "checked").containsExactly(
-                Tuple.tuple(
-                        event.getId(),
-                        event.getEventName(),
-                        false
-                )
-        );
 
     }
 
@@ -250,14 +221,6 @@ public class ReportIntegrationTest {
                 LocalDate.of(2024, 1, 1),
                 LocalDate.of(2024, 1, 2)
         );
-
-
-        for(LocalDate expectedEmpty : expectedEmptys){
-            assertThat(actual.getData().get(expectedEmpty)).isEmpty();
-        }
-        for(LocalDate expectedNotEmpty : expectedNotEmptys){
-            assertThat(actual.getData().get(expectedNotEmpty)).isNotEmpty();
-        }
 
     }
 

@@ -25,27 +25,17 @@ public class ReportService {
      * 사용자의 이벤트 클리어 여부를 날짜별로 조회하는 메서드
      * @author minseok kim
     */
-    public Map<LocalDate, List<ReportDateResponse>> getReportDateIn(Long userId, LocalDate startDate, LocalDate endDate) {
+    public List<ReportDateResponse> getReportDateIn(Long userId, LocalDate startDate, LocalDate endDate) {
         List<UserEventLogDto> eventLogs = userService.getEventLogDateIn(userId, startDate, endDate);
 
-        List<LocalDate> dates = generateDateRange(startDate, endDate);
-        Map<LocalDate, List<ReportDateResponse>> resultMap = new HashMap<>();
-
-        for(LocalDate date : dates){
-            resultMap.put(date, new ArrayList<>());
-        }
-
-        for(UserEventLogDto dto : eventLogs){
-            resultMap.get(dto.getCheckTime().toLocalDate()).add(
-                    new ReportDateResponse(
-                        dto.getEventId(),
-                        dto.getEventName(),
-                        dto.isCheck(),
-                        dto.getCheckTime()
-            ));
-        }
-
-        return resultMap;
+        return eventLogs.stream().map(dto->
+                new ReportDateResponse(
+                    dto.getEventId(),
+                    dto.getCheckTime().toInstant().getEpochSecond(),
+                    dto.getEventName(),
+                    dto.isCheck(),
+                    dto.getCheckTime()
+                )).toList();
     }
 
 

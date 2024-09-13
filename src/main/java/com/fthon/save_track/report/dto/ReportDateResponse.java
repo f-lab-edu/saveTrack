@@ -14,6 +14,7 @@ import java.util.Objects;
 public class ReportDateResponse {
 
     private Long eventId;
+    private Long checkAt;
     private String eventName;
     private boolean checked;
     private ZonedDateTime checkTime;
