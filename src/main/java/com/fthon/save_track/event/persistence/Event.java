@@ -31,7 +31,7 @@ public class Event extends BaseEntity {
     private List<Subscription> subscribeEntity;
 
     @Builder.Default
-    private boolean eventFinish = false;
+    private boolean deleted = false;
 
     private String eventName;
     private String eventContent;
@@ -52,7 +52,7 @@ public class Event extends BaseEntity {
         return this;
     }
 
-    public void finish() {
-        this.eventFinish = true;
+    public void softDelete() {
+        this.deleted = true;  // 삭제 상태로 변경
     }
 }
