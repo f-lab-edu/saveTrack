@@ -5,6 +5,7 @@ import com.fthon.save_track.auth.dto.OAuth2LoginRequest;
 import com.fthon.save_track.auth.service.client.KakaoOAuth2Client;
 import com.fthon.save_track.common.domain.BaseEntity;
 import com.fthon.save_track.event.persistence.Event;
+import com.fthon.save_track.event.persistence.Subscription;
 import com.fthon.save_track.user.dto.UserEventLogDto;
 import com.fthon.save_track.user.persistence.User;
 import com.fthon.save_track.user.persistence.UserEventLog;
@@ -100,8 +101,10 @@ class UserServiceTest {
         User user = new User();
         Event event = new Event();
 
+        Subscription subscription = user.addSubscription(event);
+
         for(int i = 0; i < 3; i++){
-            user.addLog(event, true);
+            subscription.addLog(true);
         }
 
         ZonedDateTime dateTime = ZonedDateTime.of(2024, 9, 11, 0, 0, 0, 0, ZoneOffset.UTC);
@@ -112,7 +115,7 @@ class UserServiceTest {
         );
 
         for(int i = 0; i < 3; i++){
-            UserEventLog log = user.getLogs().get(i);
+            UserEventLog log = subscription.getLogs().get(i);
             Field createdAtField = BaseEntity.class.getDeclaredField("createdAt");
             createdAtField.setAccessible(true);
             createdAtField.set(log, dateTimes.get(i));
@@ -125,8 +128,8 @@ class UserServiceTest {
 
         //then
         List<UserEventLogDto> expected = List.of(
-                UserEventLogDto.of(user.getLogs().get(1)),
-                UserEventLogDto.of(user.getLogs().get(2))
+                UserEventLogDto.of(subscription.getLogs().get(1)),
+                UserEventLogDto.of(subscription.getLogs().get(2))
         );
 
         assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);

@@ -20,8 +20,8 @@ public class UserEventLogDto {
 
     public static UserEventLogDto of(UserEventLog log){
         return new UserEventLogDto(
-                log.getEvent().getId(),
-                log.getEvent().getEventName(),
+                log.getSubscription().getEventEntity().getId(),
+                log.getSubscription().getEventEntity().getEventName(),
                 log.isChecked(),
                 log.getCreatedAt()
         );

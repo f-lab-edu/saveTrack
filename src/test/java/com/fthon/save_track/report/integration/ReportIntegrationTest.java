@@ -5,13 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fthon.save_track.auth.dto.AuthenticatedUserDto;
 import com.fthon.save_track.auth.utils.JwtUtils;
 import com.fthon.save_track.common.dto.ErrorResponse;
-import com.fthon.save_track.event.persistence.Category;
-import com.fthon.save_track.event.persistence.CategoryRepository;
-import com.fthon.save_track.event.persistence.Event;
-import com.fthon.save_track.event.persistence.EventRepository;
+import com.fthon.save_track.event.persistence.*;
 import com.fthon.save_track.report.controller.ReportController;
 import com.fthon.save_track.report.dto.ReportDateResponse;
 import com.fthon.save_track.user.persistence.User;
+import com.fthon.save_track.user.persistence.UserEventLog;
 import com.fthon.save_track.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,12 +64,14 @@ public class ReportIntegrationTest {
         User user = new User();
         Category category = new Category();
 
-        Event event1 = new Event(category, List.of(), "이벤트", "내용", "메시지1", "메시지2", "메시지3");
-        Event event2 = new Event(category, List.of(), "이벤트2", "내용", "메시지1", "메시지2", "메시지3");
+        Event event1 = new Event(category, List.of(), false,  "이벤트", "내용", "메시지1", "메시지2", "메시지3");
+        Event event2 = new Event(category, List.of(), false, "이벤트2", "내용", "메시지1", "메시지2", "메시지3");
 
-        user.addLog(event1, true);
-        user.addLog(event2, false);
+        Subscription s1 = user.addSubscription(event1);
+        Subscription s2 = user.addSubscription(event2);
 
+        UserEventLog l1 = s1.addLog(true);
+        UserEventLog l2 = s2.addLog(false);
 
         categoryRepository.save(category);
         eventRepository.saveAll(List.of(event1, event2));
@@ -96,9 +96,10 @@ public class ReportIntegrationTest {
         //then
         ReportController.ReportListResponse actual = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), ReportController.ReportListResponse.class);
 
-        List<ReportDateResponse> expectedEndDateData = user.getLogs().stream().map(log->{
-            return new ReportDateResponse(log.getEvent().getId(), log.getEvent().getEventName(), log.isChecked(), log.getCreatedAt());
-        }).toList();
+        List<ReportDateResponse> expectedEndDateData = List.of(
+                new ReportDateResponse(event1.getId(), event1.getEventName(), l1.isChecked(), l1.getCreatedAt()),
+                new ReportDateResponse(event2.getId(), event2.getEventName(), l2.isChecked(), l2.getCreatedAt())
+        );
 
 
         assertThat(actual.getCode()).isEqualTo(200);

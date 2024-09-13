@@ -59,7 +59,7 @@ public class UserService {
     public List<UserEventLogDto> getEventLogDateIn(Long userId, LocalDate startDate, LocalDate endDate){
         User user = userRepository.findById(userId).orElseThrow(() -> new UnAuthorizedException("사용자 정보를 조회할 수 없습니다."));
 
-        return user.getLogs().stream().filter(log->
+        return user.getSubscriptions().stream().flatMap(s->s.getLogs().stream()).filter(log->
                 {
                     ZonedDateTime startDateTime = ZonedDateTime.of(startDate, LocalTime.MIN, log.getCreatedAt().getZone());
                     ZonedDateTime endDateTime = ZonedDateTime.of(endDate, LocalTime.MAX, log.getCreatedAt().getZone());

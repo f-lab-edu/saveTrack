@@ -4,6 +4,7 @@ package com.fthon.save_track.user.persistence;
 import com.fthon.save_track.badge.persistence.Badge;
 import com.fthon.save_track.common.domain.BaseEntity;
 import com.fthon.save_track.event.persistence.Event;
+import com.fthon.save_track.event.persistence.Subscription;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,15 +35,20 @@ public class User extends BaseEntity {
         this.email = email;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    private List<UserEventLog> logs = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userEntity")
+    private List<Subscription> subscriptions = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     private List<UserBadge> badges = new ArrayList<>();
 
+    public Subscription addSubscription(Event event){
+        Subscription subscription = Subscription.builder()
+                .eventEntity(event)
+                .userEntity(this)
+                .build();
 
-    public void addLog(Event event, boolean isCheck){
-        this.logs.add(new UserEventLog(this, event, isCheck));
+        this.subscriptions.add(subscription);
+        return subscription;
     }
 
     public void addBadge(Badge badge){
